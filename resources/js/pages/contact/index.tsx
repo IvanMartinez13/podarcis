@@ -25,6 +25,7 @@ type ContactProps = {
     page: Pick<CmsPage, 'title' | 'excerpt' | 'content'> | null;
     services: ContactService[];
     selectedServiceId: number | null;
+    contactSource: string | null;
     turnstileSiteKey: string | null;
 };
 
@@ -45,6 +46,7 @@ export default function ContactIndex({
     page,
     services,
     selectedServiceId,
+    contactSource,
     turnstileSiteKey,
 }: ContactProps) {
     const { flash } = usePage().props as {
@@ -57,7 +59,7 @@ export default function ContactIndex({
         company: '',
         service_id: selectedServiceId ? String(selectedServiceId) : '',
         message: '',
-        source: 'contact_page',
+        source: contactSource ?? 'contact_page',
         privacy_accepted: false,
         cf_turnstile_response: '',
         website: '',

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File;
 
 class StoreServiceRequest extends FormRequest
 {
@@ -25,6 +26,7 @@ class StoreServiceRequest extends FormRequest
         $this->merge([
             'slug' => Str::slug($slug !== '' ? $slug : $title),
             'is_featured' => $this->boolean('is_featured'),
+            'remove_featured_image' => $this->boolean('remove_featured_image'),
             'sort_order' => $this->input('sort_order') === null ? 0 : $this->input('sort_order'),
         ]);
     }
@@ -43,6 +45,8 @@ class StoreServiceRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'icon' => ['nullable', 'string', 'max:255'],
             'featured_image' => ['nullable', 'string', 'max:255'],
+            'featured_image_upload' => ['nullable', File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(5 * 1024)],
+            'remove_featured_image' => ['boolean'],
             'seo_title' => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string'],
             'is_featured' => ['boolean'],

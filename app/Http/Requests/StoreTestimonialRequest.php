@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File;
 
 class StoreTestimonialRequest extends FormRequest
 {
@@ -20,6 +21,7 @@ class StoreTestimonialRequest extends FormRequest
     {
         $this->merge([
             'is_featured' => $this->boolean('is_featured'),
+            'remove_avatar' => $this->boolean('remove_avatar'),
             'sort_order' => $this->input('sort_order') === null ? 0 : $this->input('sort_order'),
         ]);
     }
@@ -37,6 +39,8 @@ class StoreTestimonialRequest extends FormRequest
             'company' => ['nullable', 'string', 'max:255'],
             'quote' => ['required', 'string'],
             'avatar' => ['nullable', 'string', 'max:255'],
+            'avatar_upload' => ['nullable', File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(3 * 1024)],
+            'remove_avatar' => ['boolean'],
             'is_featured' => ['boolean'],
             'sort_order' => ['required', 'integer', 'min:0'],
             'status' => ['required', 'string', Rule::in(['draft', 'published'])],

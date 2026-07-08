@@ -20,6 +20,7 @@ createInertiaApp({
             case name.startsWith('success-cases/'):
             case name.startsWith('pages/'):
             case name.startsWith('contact/'):
+            case name.startsWith('legal/'):
                 return PublicLayout;
             case name.startsWith('auth/'):
                 return AuthLayout;

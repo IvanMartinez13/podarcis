@@ -42,8 +42,20 @@ test('home renders with dynamic cms props', function () {
             ->where('testimonials.0.name', 'Cliente satisfecho'));
 });
 
+test('legal pages render as public inertia pages', function (string $routeName, string $component) {
+    $this->get(route($routeName))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component($component));
+})->with([
+    'privacy policy' => ['legal.privacy', 'legal/privacy'],
+    'cookies policy' => ['legal.cookies', 'legal/cookies'],
+]);
+
 test('services index and show expose only published services', function () {
-    $published = Service::factory()->published()->ordered(10)->create(['title' => 'Servicio publicado']);
+    $published = Service::factory()->published()->ordered(10)->create([
+        'title' => 'Servicio publicado',
+        'featured_image' => 'https://placehold.co/1200x760/163247/FFFFFF?text=Servicio',
+    ]);
     $draft = Service::factory()->create(['title' => 'Servicio borrador']);
 
     $this->get(route('services.index'))
@@ -51,7 +63,9 @@ test('services index and show expose only published services', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('services/index')
             ->has('services', 1)
-            ->where('services.0.title', 'Servicio publicado'));
+            ->where('services.0.title', 'Servicio publicado')
+            ->where('services.0.slug', $published->slug)
+            ->where('services.0.featuredImage', 'https://placehold.co/1200x760/163247/FFFFFF?text=Servicio'));
 
     $this->get(route('services.show', $published))->assertOk();
     $this->get(route('services.show', $draft))->assertNotFound();
@@ -100,13 +114,49 @@ test('about page loads the published quienes somos page', function () {
     Page::factory()->published()->create([
         'title' => 'Quiénes somos',
         'slug' => 'quienes-somos',
+        'blocks' => [
+            'teamCoverImage' => 'https://placehold.co/1440x760/163247/FFFFFF?text=Equipo',
+            'teamMembers' => [
+                [
+                    'name' => 'Javi A. Torres',
+                    'title' => 'Software Engineer',
+                    'handle' => 'javicodes',
+                    'status' => 'Online',
+                    'contactText' => 'Contactar',
+                    'avatarUrl' => 'https://placehold.co/720x1000/163247/FFFFFF?text=Javi',
+                    'enableTilt' => true,
+                    'innerGradient' => 'linear-gradient(145deg, #244D3A8C 0%, #6FAF4544 100%)',
+                ],
+            ],
+        ],
     ]);
 
     $this->get(route('pages.about'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('pages/about')
-            ->where('page.title', 'Quiénes somos'));
+            ->where('page.title', 'Quiénes somos')
+            ->where('page.blocks.teamCoverImage', 'https://placehold.co/1440x760/163247/FFFFFF?text=Equipo')
+            ->where('page.blocks.teamMembers.0.name', 'Javi A. Torres')
+            ->missing('page.blocks.teamMembers.0.enableTilt')
+            ->missing('page.blocks.teamMembers.0.innerGradient'));
+});
+
+test('about page renders when team members collection is empty', function () {
+    Page::factory()->published()->create([
+        'title' => 'Quiénes somos',
+        'slug' => 'quienes-somos',
+        'blocks' => [
+            'teamCoverImage' => 'https://placehold.co/1440x760/163247/FFFFFF?text=Equipo',
+            'teamMembers' => [],
+        ],
+    ]);
+
+    $this->get(route('pages.about'))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('pages/about')
+            ->where('page.blocks.teamMembers', []));
 });
 
 test('contact page loads published services', function () {

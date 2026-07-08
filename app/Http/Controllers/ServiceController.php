@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use App\Models\SuccessCase;
+use App\Support\CmsImageStorage;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ServiceController extends Controller
 {
+    public function __construct(private CmsImageStorage $images) {}
+
     public function index(): Response
     {
         return Inertia::render('services/index', [
@@ -36,7 +39,7 @@ class ServiceController extends Controller
                 'sector' => $successCase->sector,
                 'excerpt' => $successCase->challenge ?: $successCase->solution,
                 'result' => $successCase->result,
-                'featuredImage' => $successCase->featured_image,
+                'featuredImage' => $this->images->url($successCase->featured_image),
                 'href' => route('success-cases.show', $successCase),
             ]),
         ]);
@@ -53,7 +56,7 @@ class ServiceController extends Controller
             'slug' => $service->slug,
             'excerpt' => $service->excerpt,
             'icon' => $service->icon,
-            'featuredImage' => $service->featured_image,
+            'featuredImage' => $this->images->url($service->featured_image),
             'href' => route('services.show', $service),
         ];
     }

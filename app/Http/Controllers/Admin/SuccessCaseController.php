@@ -7,6 +7,7 @@ use App\Http\Requests\StoreSuccessCaseRequest;
 use App\Http\Requests\UpdateSuccessCaseRequest;
 use App\Models\Service;
 use App\Models\SuccessCase;
+use App\Support\CmsImageStorage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Inertia\Response;
 
 class SuccessCaseController extends Controller
 {
+    public function __construct(private CmsImageStorage $images) {}
+
     public function index(Request $request): Response
     {
         $filters = [
@@ -59,7 +62,15 @@ class SuccessCaseController extends Controller
 
     public function store(StoreSuccessCaseRequest $request): RedirectResponse
     {
-        SuccessCase::query()->create($request->validated());
+        $data = $request->safe()->except(['featured_image_upload', 'remove_featured_image']);
+
+        if ($request->hasFile('featured_image_upload')) {
+            $data['featured_image'] = $this->images->store($request->file('featured_image_upload'), 'cms/success-cases');
+        } elseif (blank($data['featured_image'] ?? null)) {
+            $data['featured_image'] = null;
+        }
+
+        SuccessCase::query()->create($data);
 
         return to_route('admin.success-cases.index')->with('success', 'Caso de éxito creado correctamente.');
     }
@@ -74,13 +85,26 @@ class SuccessCaseController extends Controller
 
     public function update(UpdateSuccessCaseRequest $request, SuccessCase $successCase): RedirectResponse
     {
-        $successCase->update($request->validated());
+        $data = $request->safe()->except(['featured_image_upload', 'remove_featured_image']);
+
+        if ($request->hasFile('featured_image_upload')) {
+            $data['featured_image'] = $this->images->store($request->file('featured_image_upload'), 'cms/success-cases', $successCase->featured_image);
+        } elseif ($request->boolean('remove_featured_image')) {
+            $this->images->delete($successCase->featured_image);
+            $data['featured_image'] = null;
+        } else {
+            unset($data['featured_image']);
+        }
+
+        $successCase->update($data);
 
         return to_route('admin.success-cases.index')->with('success', 'Caso de éxito actualizado correctamente.');
     }
 
     public function destroy(SuccessCase $successCase): RedirectResponse
     {
+        $this->images->delete($successCase->featured_image);
+
         $successCase->delete();
 
         return to_route('admin.success-cases.index')->with('success', 'Caso de éxito eliminado correctamente.');
@@ -136,7 +160,7 @@ class SuccessCaseController extends Controller
             'challenge' => $successCase->challenge,
             'solution' => $successCase->solution,
             'result' => $successCase->result,
-            'featuredImage' => $successCase->featured_image,
+            'featuredImage' => $this->images->url($successCase->featured_image),
             'serviceId' => $successCase->service_id,
             'status' => $successCase->status,
             'publishedAt' => $successCase->published_at?->format('Y-m-d\TH:i'),

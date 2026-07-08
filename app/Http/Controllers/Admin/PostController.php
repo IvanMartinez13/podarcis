@@ -7,6 +7,7 @@ use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
 use App\Models\Category;
 use App\Models\Post;
+use App\Support\CmsImageStorage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use Inertia\Response;
 
 class PostController extends Controller
 {
+    public function __construct(private CmsImageStorage $images) {}
+
     public function index(Request $request): Response
     {
         $filters = [
@@ -58,8 +61,14 @@ class PostController extends Controller
 
     public function store(StorePostRequest $request): RedirectResponse
     {
-        $data = $request->validated();
+        $data = $request->safe()->except(['featured_image_upload', 'remove_featured_image']);
         $data['author_id'] = $request->user()?->id;
+
+        if ($request->hasFile('featured_image_upload')) {
+            $data['featured_image'] = $this->images->store($request->file('featured_image_upload'), 'cms/posts');
+        } elseif (blank($data['featured_image'] ?? null)) {
+            $data['featured_image'] = null;
+        }
 
         Post::query()->create($data);
 
@@ -76,8 +85,17 @@ class PostController extends Controller
 
     public function update(UpdatePostRequest $request, Post $post): RedirectResponse
     {
-        $data = $request->validated();
+        $data = $request->safe()->except(['featured_image_upload', 'remove_featured_image']);
         $data['author_id'] = $post->author_id ?: $request->user()?->id;
+
+        if ($request->hasFile('featured_image_upload')) {
+            $data['featured_image'] = $this->images->store($request->file('featured_image_upload'), 'cms/posts', $post->featured_image);
+        } elseif ($request->boolean('remove_featured_image')) {
+            $this->images->delete($post->featured_image);
+            $data['featured_image'] = null;
+        } else {
+            unset($data['featured_image']);
+        }
 
         $post->update($data);
 
@@ -86,6 +104,8 @@ class PostController extends Controller
 
     public function destroy(Post $post): RedirectResponse
     {
+        $this->images->delete($post->featured_image);
+
         $post->delete();
 
         return to_route('admin.posts.index')->with('success', 'Post eliminado correctamente.');
@@ -139,7 +159,7 @@ class PostController extends Controller
             'slug' => $post->slug,
             'excerpt' => $post->excerpt,
             'content' => $post->content,
-            'featuredImage' => $post->featured_image,
+            'featuredImage' => $this->images->url($post->featured_image),
             'categoryId' => $post->category_id,
             'seoTitle' => $post->seo_title,
             'seoDescription' => $post->seo_description,

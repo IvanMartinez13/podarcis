@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File;
 
 class StorePostRequest extends FormRequest
 {
@@ -28,6 +29,7 @@ class StorePostRequest extends FormRequest
             'published_at' => $status === 'published' && blank($this->input('published_at'))
                 ? now()
                 : $this->input('published_at'),
+            'remove_featured_image' => $this->boolean('remove_featured_image'),
         ]);
     }
 
@@ -44,6 +46,8 @@ class StorePostRequest extends FormRequest
             'excerpt' => ['nullable', 'string'],
             'content' => ['required', 'string'],
             'featured_image' => ['nullable', 'string', 'max:255'],
+            'featured_image_upload' => ['nullable', File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(5 * 1024)],
+            'remove_featured_image' => ['boolean'],
             'category_id' => ['nullable', 'integer', Rule::exists('categories', 'id')->where('type', 'post')],
             'seo_title' => ['nullable', 'string', 'max:255'],
             'seo_description' => ['nullable', 'string'],

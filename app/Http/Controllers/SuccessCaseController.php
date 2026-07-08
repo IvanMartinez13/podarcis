@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\SuccessCase;
+use App\Support\CmsImageStorage;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class SuccessCaseController extends Controller
 {
+    public function __construct(private CmsImageStorage $images) {}
+
     public function index(): Response
     {
         return Inertia::render('success-cases/index', [
@@ -59,7 +62,7 @@ class SuccessCaseController extends Controller
             'sector' => $successCase->sector,
             'excerpt' => $successCase->challenge ?: $successCase->solution,
             'result' => $successCase->result,
-            'featuredImage' => $successCase->featured_image,
+            'featuredImage' => $this->images->url($successCase->featured_image),
             'href' => route('success-cases.show', $successCase),
             'service' => $successCase->service ? [
                 'title' => $successCase->service->title,

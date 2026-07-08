@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTestimonialRequest;
 use App\Http\Requests\UpdateTestimonialRequest;
 use App\Models\Testimonial;
+use App\Support\CmsImageStorage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,6 +15,8 @@ use Inertia\Response;
 
 class TestimonialController extends Controller
 {
+    public function __construct(private CmsImageStorage $images) {}
+
     public function index(Request $request): Response
     {
         $filters = [
@@ -56,7 +59,15 @@ class TestimonialController extends Controller
 
     public function store(StoreTestimonialRequest $request): RedirectResponse
     {
-        Testimonial::query()->create($request->validated());
+        $data = $request->safe()->except(['avatar_upload', 'remove_avatar']);
+
+        if ($request->hasFile('avatar_upload')) {
+            $data['avatar'] = $this->images->store($request->file('avatar_upload'), 'cms/testimonials/avatars', preservePng: true);
+        } elseif (blank($data['avatar'] ?? null)) {
+            $data['avatar'] = null;
+        }
+
+        Testimonial::query()->create($data);
 
         return to_route('admin.testimonials.index')->with('success', 'Testimonio creado correctamente.');
     }
@@ -70,13 +81,26 @@ class TestimonialController extends Controller
 
     public function update(UpdateTestimonialRequest $request, Testimonial $testimonial): RedirectResponse
     {
-        $testimonial->update($request->validated());
+        $data = $request->safe()->except(['avatar_upload', 'remove_avatar']);
+
+        if ($request->hasFile('avatar_upload')) {
+            $data['avatar'] = $this->images->store($request->file('avatar_upload'), 'cms/testimonials/avatars', $testimonial->avatar, preservePng: true);
+        } elseif ($request->boolean('remove_avatar')) {
+            $this->images->delete($testimonial->avatar);
+            $data['avatar'] = null;
+        } else {
+            unset($data['avatar']);
+        }
+
+        $testimonial->update($data);
 
         return to_route('admin.testimonials.index')->with('success', 'Testimonio actualizado correctamente.');
     }
 
     public function destroy(Testimonial $testimonial): RedirectResponse
     {
+        $this->images->delete($testimonial->avatar);
+
         $testimonial->delete();
 
         return to_route('admin.testimonials.index')->with('success', 'Testimonio eliminado correctamente.');
@@ -93,7 +117,7 @@ class TestimonialController extends Controller
             'position' => $testimonial->position,
             'company' => $testimonial->company,
             'quote' => $testimonial->quote,
-            'avatar' => $testimonial->avatar,
+            'avatar' => $this->images->url($testimonial->avatar),
             'isFeatured' => $testimonial->is_featured,
             'sortOrder' => $testimonial->sort_order,
             'status' => $testimonial->status,
@@ -111,7 +135,7 @@ class TestimonialController extends Controller
             'position' => $testimonial->position,
             'company' => $testimonial->company,
             'quote' => $testimonial->quote,
-            'avatar' => $testimonial->avatar,
+            'avatar' => $this->images->url($testimonial->avatar),
             'isFeatured' => $testimonial->is_featured,
             'sortOrder' => $testimonial->sort_order,
             'status' => $testimonial->status,

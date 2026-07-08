@@ -2,6 +2,7 @@ import { Link, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import { AdminFormSection } from '@/components/admin/admin-form-section';
 import { FormField } from '@/components/admin/form-field';
+import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -24,13 +25,28 @@ type TestimonialFormProps = {
     mode: 'create' | 'edit';
 };
 
+type TestimonialFormPayload = {
+    name: string;
+    position: string;
+    company: string;
+    quote: string;
+    avatar: string;
+    avatar_upload: File | null;
+    remove_avatar: boolean;
+    is_featured: boolean;
+    sort_order: number;
+    status: 'draft' | 'published';
+};
+
 export function TestimonialForm({ testimonial, mode }: TestimonialFormProps) {
-    const form = useForm({
+    const form = useForm<TestimonialFormPayload>({
         name: testimonial.name,
         position: testimonial.position ?? '',
         company: testimonial.company ?? '',
         quote: testimonial.quote ?? '',
         avatar: testimonial.avatar ?? '',
+        avatar_upload: null,
+        remove_avatar: false,
         is_featured: testimonial.isFeatured,
         sort_order: testimonial.sortOrder,
         status: testimonial.status,
@@ -40,14 +56,18 @@ export function TestimonialForm({ testimonial, mode }: TestimonialFormProps) {
         event.preventDefault();
 
         if (mode === 'create') {
-            form.post(testimonials.store().url);
+            form.post(testimonials.store().url, { forceFormData: true });
 
             return;
         }
 
         if (testimonial.id !== null) {
-            form.patch(
+            form.transform((data) => ({ ...data, _method: 'patch' }));
+            form.post(
                 testimonials.update({ testimonial: testimonial.id }).url,
+                {
+                    forceFormData: true,
+                },
             );
         }
     }
@@ -160,20 +180,21 @@ export function TestimonialForm({ testimonial, mode }: TestimonialFormProps) {
                             }
                         />
                     </FormField>
-                    <FormField
-                        error={form.errors.avatar}
-                        htmlFor="avatar"
+                    <ImageUploadField
+                        id="avatar_upload"
                         label="Avatar"
-                    >
-                        <Input
-                            id="avatar"
-                            placeholder="https://placehold.co/300x300"
-                            value={form.data.avatar}
-                            onChange={(event) =>
-                                form.setData('avatar', event.target.value)
-                            }
-                        />
-                    </FormField>
+                        currentImageUrl={testimonial.avatar}
+                        error={form.errors.avatar_upload ?? form.errors.avatar}
+                        help="JPG, PNG o WebP. Los PNG se conservarán para mantener transparencias."
+                        progress={form.progress?.percentage ?? null}
+                        remove={form.data.remove_avatar}
+                        onFileChange={(file) =>
+                            form.setData('avatar_upload', file)
+                        }
+                        onRemoveChange={(remove) =>
+                            form.setData('remove_avatar', remove)
+                        }
+                    />
                 </div>
 
                 <label className="flex items-center gap-3 rounded-md border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200">

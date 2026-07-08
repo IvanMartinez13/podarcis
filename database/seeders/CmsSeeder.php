@@ -140,6 +140,27 @@ class CmsSeeder extends Seeder
                 'title' => 'Quiénes somos',
                 'excerpt' => 'PODARCIS es una consultoría técnica especializada en medio ambiente, calidad, sostenibilidad y herramientas digitales.',
                 'content' => "Trabajamos con empresas, administraciones y organizaciones que necesitan cumplir, medir y avanzar con rigor.\n\nNuestro enfoque combina experiencia técnica, cercanía y soluciones digitales propias para transformar obligaciones complejas en procesos claros.",
+                'blocks' => [
+                    'teamCoverImage' => 'https://placehold.co/1440x760/163247/FFFFFF?text=Equipo+PODARCIS',
+                    'teamMembers' => [
+                        [
+                            'name' => 'Javi A. Torres',
+                            'title' => 'Software Engineer',
+                            'handle' => 'javicodes',
+                            'status' => 'Disponible',
+                            'contactText' => 'Contactar',
+                            'avatarUrl' => 'https://placehold.co/720x1000/163247/FFFFFF?text=Javi',
+                        ],
+                        [
+                            'name' => 'Laura Martínez',
+                            'title' => 'Consultora ambiental',
+                            'handle' => 'lauraambiental',
+                            'status' => 'Online',
+                            'contactText' => 'Contactar',
+                            'avatarUrl' => 'https://placehold.co/720x1000/0E2535/FFFFFF?text=Laura',
+                        ],
+                    ],
+                ],
                 'seo_title' => 'Quiénes somos | PODARCIS',
                 'seo_description' => 'Conoce el enfoque técnico y digital de PODARCIS.',
                 'status' => 'published',

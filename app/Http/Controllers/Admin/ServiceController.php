@@ -6,12 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreServiceRequest;
 use App\Http\Requests\UpdateServiceRequest;
 use App\Models\Service;
+use App\Support\CmsImageStorage;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ServiceController extends Controller
 {
+    public function __construct(private CmsImageStorage $images) {}
+
     public function index(): Response
     {
         return Inertia::render('admin/services/index', [
@@ -31,7 +34,15 @@ class ServiceController extends Controller
 
     public function store(StoreServiceRequest $request): RedirectResponse
     {
-        Service::query()->create($request->validated());
+        $data = $request->safe()->except(['featured_image_upload', 'remove_featured_image']);
+
+        if ($request->hasFile('featured_image_upload')) {
+            $data['featured_image'] = $this->images->store($request->file('featured_image_upload'), 'cms/services');
+        } elseif (blank($data['featured_image'] ?? null)) {
+            $data['featured_image'] = null;
+        }
+
+        Service::query()->create($data);
 
         return to_route('admin.services.index')->with('success', 'Servicio creado correctamente.');
     }
@@ -45,13 +56,26 @@ class ServiceController extends Controller
 
     public function update(UpdateServiceRequest $request, Service $service): RedirectResponse
     {
-        $service->update($request->validated());
+        $data = $request->safe()->except(['featured_image_upload', 'remove_featured_image']);
+
+        if ($request->hasFile('featured_image_upload')) {
+            $data['featured_image'] = $this->images->store($request->file('featured_image_upload'), 'cms/services', $service->featured_image);
+        } elseif ($request->boolean('remove_featured_image')) {
+            $this->images->delete($service->featured_image);
+            $data['featured_image'] = null;
+        } else {
+            unset($data['featured_image']);
+        }
+
+        $service->update($data);
 
         return to_route('admin.services.index')->with('success', 'Servicio actualizado correctamente.');
     }
 
     public function destroy(Service $service): RedirectResponse
     {
+        $this->images->delete($service->featured_image);
+
         $service->delete();
 
         return to_route('admin.services.index')->with('success', 'Servicio eliminado correctamente.');
@@ -85,7 +109,7 @@ class ServiceController extends Controller
             'excerpt' => $service->excerpt,
             'description' => $service->description,
             'icon' => $service->icon,
-            'featuredImage' => $service->featured_image,
+            'featuredImage' => $this->images->url($service->featured_image),
             'seoTitle' => $service->seo_title,
             'seoDescription' => $service->seo_description,
             'isFeatured' => $service->is_featured,

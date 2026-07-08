@@ -1,17 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
-import {
-    ArrowRight,
-    Building2,
-    Cpu,
-    Factory,
-    FileSearch,
-    Quote,
-    Sparkles,
-    Sprout,
-    Target,
-    TrendingUp,
-} from 'lucide-react';
+import { ArrowRight, Cpu, FileSearch, Quote, Sprout } from 'lucide-react';
 
+import heroImage from '@/assets/hero.png';
 import { Container } from '@/components/public/container';
 import { CTASection } from '@/components/public/cta-section';
 import { EmptyState } from '@/components/public/empty-state';
@@ -70,21 +60,11 @@ export default function Welcome({
                 <div className="absolute top-24 right-[10%] hidden size-28 rounded-full border border-podarcis-green/20 motion-safe:animate-[podarcis-float_8s_ease-in-out_infinite] lg:block" />
                 <Container className="relative grid min-h-[calc(100svh-4.5rem)] items-center gap-12 py-16 lg:grid-cols-[1.02fr_0.98fr] lg:py-20">
                     <div className="max-w-3xl">
-                        <Badge className="border-white/15 bg-white/5 text-white shadow-lg shadow-black/10 backdrop-blur-sm">
-                            <Sparkles className="size-3 text-podarcis-green" />
-                            Consultoría ambiental, calidad y sostenibilidad
-                        </Badge>
                         <h1 className="mt-6 max-w-4xl text-4xl leading-tight font-semibold text-balance sm:text-5xl lg:text-6xl">
-                            Consultoría ambiental, calidad y sostenibilidad para
-                            empresas que necesitan cumplir, medir y avanzar sin
-                            perder tiempo.
+                            Consultoría ambiental, calidad y sostenibilidad para empresas que quieren avanzar con seguridad.
                         </h1>
                         <p className="mt-6 max-w-2xl text-lg leading-8 text-white/75">
-                            Combinamos experiencia técnica, auditoría
-                            especializada y herramientas digitales propias para
-                            ayudar a empresas, administraciones y organizaciones
-                            a gestionar sus obligaciones ambientales y de
-                            calidad.
+                            Ayudamos a empresas, administraciones y organizaciones a gestionar sus obligaciones ambientales y de calidad combinando consultoría técnica, auditoría especializada y herramientas digitales propias.
                         </p>
                         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                             <Button
@@ -128,45 +108,12 @@ export default function Welcome({
                         </div>
                     </div>
 
-                    <div className="relative">
-                        <div className="absolute -inset-6 rounded-lg bg-podarcis-green/15 blur-3xl" />
-                        <div className="relative overflow-hidden rounded-lg border border-white/12 bg-podarcis-ink/18 p-4 shadow-2xl shadow-black/20 backdrop-blur-[2px]">
-                            <div className="aspect-[4/3] rounded-md border border-white/10 bg-white/5 p-6">
-                                <div className="flex h-full flex-col justify-between">
-                                    <div>
-                                        <span className="inline-flex rounded-md border border-podarcis-green/30 bg-podarcis-green/10 px-3 py-1 text-sm font-semibold text-podarcis-green">
-                                            PODARCIS CMS
-                                        </span>
-                                        <p className="mt-5 max-w-sm text-2xl leading-tight font-semibold text-white">
-                                            Datos técnicos, cumplimiento y
-                                            seguimiento conectados.
-                                        </p>
-                                    </div>
-                                    <div className="h-px w-full bg-linear-to-r from-podarcis-green/70 via-white/20 to-transparent" />
-                                </div>
-                            </div>
-                            <div className="mt-4 grid grid-cols-2 gap-3">
-                                {[
-                                    [Factory, 'Industria'],
-                                    [Building2, 'Administración'],
-                                    [Target, 'Auditoría'],
-                                    [TrendingUp, 'Indicadores'],
-                                ].map(([Icon, label]) => (
-                                    <div
-                                        className="rounded-md border border-white/10 bg-white/5 p-4 backdrop-blur-[2px] transition duration-300 hover:-translate-y-1 hover:bg-white/10"
-                                        key={label as string}
-                                    >
-                                        <Icon
-                                            className="size-5 text-podarcis-green"
-                                            aria-hidden="true"
-                                        />
-                                        <span className="mt-3 block text-sm font-medium">
-                                            {label as string}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                    <div className="relative hidden lg:block">
+                        <img
+                                alt="Consultoría ambiental y sostenibilidad PODARCIS"
+                                className="relative mx-auto max-h-[520px] w-full object-contain drop-shadow-[0_32px_55px_rgba(0,0,0,0.28)]"
+                                src={heroImage}
+                            />
                     </div>
                 </Container>
             </PublicHero>
@@ -174,8 +121,8 @@ export default function Welcome({
             <Section
                 eyebrow="Servicios destacados"
                 id="servicios"
-                title="Un CMS vivo empieza con servicios que ya se pueden consultar"
-                description="Las líneas destacadas salen de base de datos y mantienen el diseño de tarjetas premium de la fase anterior."
+                title="Servicios clave para cumplir, medir y avanzar con criterio"
+                description="Seleccionamos las líneas de trabajo más relevantes para ayudarte a ordenar obligaciones, evidencias y decisiones técnicas desde el primer paso."
             >
                 {services.length > 0 ? (
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -267,6 +214,7 @@ export default function Welcome({
                 eyebrow="Casos de éxito"
                 id="casos"
                 title="Resultados publicados desde el CMS"
+                titleClassName="text-podarcis-green"
                 className="bg-podarcis-navy text-white"
             >
                 {successCases.length > 0 ? (

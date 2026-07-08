@@ -8,6 +8,8 @@ use App\Models\Service;
 use App\Models\SuccessCase;
 use App\Models\Testimonial;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('admin routes require authentication', function (string $routeName) {
@@ -61,6 +63,94 @@ test('service can be created with generated slug', function () {
         'status' => 'published',
         'is_featured' => true,
     ]);
+});
+
+test('service image upload is optimized to webp', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('admin.services.store'), [
+            'title' => 'Servicio con imagen',
+            'slug' => '',
+            'excerpt' => 'Servicio estratégico.',
+            'description' => 'Descripción del servicio.',
+            'icon' => 'leaf',
+            'featured_image_upload' => UploadedFile::fake()->image('servicio.jpg', 1200, 760),
+            'seo_title' => '',
+            'seo_description' => '',
+            'is_featured' => false,
+            'sort_order' => 10,
+            'status' => 'draft',
+            'published_at' => null,
+        ])
+        ->assertRedirect(route('admin.services.index'))
+        ->assertSessionHas('success');
+
+    $service = Service::query()->where('slug', 'servicio-con-imagen')->firstOrFail();
+
+    expect($service->featured_image)->toStartWith('cms/services/')
+        ->and($service->featured_image)->toEndWith('.webp');
+
+    Storage::disk('public')->assertExists($service->featured_image);
+});
+
+test('service image replacement and removal cleans local files', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+    $service = Service::factory()->create([
+        'featured_image' => 'cms/services/old.webp',
+    ]);
+
+    Storage::disk('public')->put('cms/services/old.webp', 'old-image');
+
+    $this->actingAs($user)
+        ->patch(route('admin.services.update', $service), [
+            'title' => $service->title,
+            'slug' => $service->slug,
+            'excerpt' => 'Extracto.',
+            'description' => 'Descripción.',
+            'icon' => '',
+            'featured_image_upload' => UploadedFile::fake()->image('nueva.png', 1200, 760),
+            'seo_title' => '',
+            'seo_description' => '',
+            'is_featured' => false,
+            'sort_order' => 10,
+            'status' => 'draft',
+            'published_at' => null,
+        ])
+        ->assertRedirect(route('admin.services.index'));
+
+    $service->refresh();
+    $newImage = $service->featured_image;
+
+    expect($newImage)->toEndWith('.webp');
+    Storage::disk('public')->assertMissing('cms/services/old.webp');
+    Storage::disk('public')->assertExists($newImage);
+
+    $this->actingAs($user)
+        ->patch(route('admin.services.update', $service), [
+            'title' => $service->title,
+            'slug' => $service->slug,
+            'excerpt' => 'Extracto.',
+            'description' => 'Descripción.',
+            'icon' => '',
+            'remove_featured_image' => true,
+            'seo_title' => '',
+            'seo_description' => '',
+            'is_featured' => false,
+            'sort_order' => 10,
+            'status' => 'draft',
+            'published_at' => null,
+        ])
+        ->assertRedirect(route('admin.services.index'));
+
+    $service->refresh();
+
+    expect($service->featured_image)->toBeNull();
+    Storage::disk('public')->assertMissing($newImage);
 });
 
 test('service can be updated while ignoring its own slug uniqueness', function () {
@@ -154,6 +244,32 @@ test('post can be created with generated slug, authenticated author and automati
 
     expect($post->author_id)->toBe($user->id)
         ->and($post->published_at)->not->toBeNull();
+});
+
+test('post image upload is optimized to webp', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('admin.posts.store'), [
+            'title' => 'Post con imagen',
+            'slug' => '',
+            'excerpt' => 'Extracto.',
+            'content' => 'Contenido completo.',
+            'featured_image_upload' => UploadedFile::fake()->image('post.jpg', 1200, 760),
+            'category_id' => null,
+            'seo_title' => '',
+            'seo_description' => '',
+            'status' => 'draft',
+            'published_at' => null,
+        ])
+        ->assertRedirect(route('admin.posts.index'));
+
+    $post = Post::query()->where('slug', 'post-con-imagen')->firstOrFail();
+
+    expect($post->featured_image)->toEndWith('.webp');
+    Storage::disk('public')->assertExists($post->featured_image);
 });
 
 test('post can be updated while ignoring its own slug uniqueness', function () {
@@ -273,6 +389,172 @@ test('page can be updated while ignoring its own slug uniqueness', function () {
     ]);
 });
 
+test('about page can be updated with configurable team blocks', function () {
+    $user = User::factory()->create();
+    $page = Page::factory()->published()->create([
+        'title' => 'Quiénes somos',
+        'slug' => 'quienes-somos',
+    ]);
+
+    $this->actingAs($user)
+        ->patch(route('admin.pages.update', $page), [
+            'title' => 'Quiénes somos',
+            'slug' => 'quienes-somos',
+            'excerpt' => 'Equipo técnico.',
+            'content' => 'Contenido corporativo.',
+            'blocks' => [
+                'teamCoverImage' => 'https://placehold.co/1440x760/163247/FFFFFF?text=Equipo',
+                'teamMembers' => [
+                    [
+                        'name' => 'Javi A. Torres',
+                        'title' => 'Software Engineer',
+                        'handle' => 'javicodes',
+                        'status' => 'Online',
+                        'contactText' => 'Contactar',
+                        'avatarUrl' => 'https://placehold.co/720x1000/163247/FFFFFF?text=Javi',
+                    ],
+                ],
+            ],
+            'seo_title' => '',
+            'seo_description' => '',
+            'og_image' => '',
+            'status' => 'published',
+            'published_at' => now()->format('Y-m-d H:i:s'),
+        ])
+        ->assertRedirect(route('admin.pages.index'))
+        ->assertSessionHas('success');
+
+    $page->refresh();
+
+    expect($page->blocks['teamCoverImage'])->toBe('https://placehold.co/1440x760/163247/FFFFFF?text=Equipo')
+        ->and($page->blocks['teamMembers'][0]['name'])->toBe('Javi A. Torres')
+        ->and($page->blocks['teamMembers'][0])->not->toHaveKey('enableTilt')
+        ->and($page->blocks['teamMembers'][0])->not->toHaveKey('innerGradient');
+});
+
+test('about page ignores legacy team card presentation fields', function () {
+    $user = User::factory()->create();
+    $page = Page::factory()->published()->create([
+        'title' => 'Quiénes somos',
+        'slug' => 'quienes-somos',
+    ]);
+
+    $this->actingAs($user)
+        ->patch(route('admin.pages.update', $page), [
+            'title' => 'Quiénes somos',
+            'slug' => 'quienes-somos',
+            'excerpt' => 'Equipo técnico.',
+            'content' => 'Contenido corporativo.',
+            'blocks' => [
+                'teamCoverImage' => 'https://placehold.co/1440x760/163247/FFFFFF?text=Equipo',
+                'teamMembers' => [
+                    [
+                        'name' => 'Javi A. Torres',
+                        'title' => 'Software Engineer',
+                        'handle' => 'javicodes',
+                        'status' => 'Online',
+                        'contactText' => 'Contactar',
+                        'avatarUrl' => 'https://placehold.co/720x1000/163247/FFFFFF?text=Javi',
+                        'enableTilt' => true,
+                        'innerGradient' => 'linear-gradient(145deg, #244D3A8C 0%, #6FAF4544 100%)',
+                    ],
+                ],
+            ],
+            'seo_title' => '',
+            'seo_description' => '',
+            'og_image' => '',
+            'status' => 'published',
+            'published_at' => now()->format('Y-m-d H:i:s'),
+        ])
+        ->assertRedirect(route('admin.pages.index'));
+
+    $page->refresh();
+
+    expect($page->blocks['teamMembers'][0])
+        ->not->toHaveKey('enableTilt')
+        ->not->toHaveKey('innerGradient');
+});
+
+test('about page stores team cover as webp and png avatars in blocks', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+    $page = Page::factory()->published()->create([
+        'title' => 'Quiénes somos',
+        'slug' => 'quienes-somos',
+    ]);
+
+    $this->actingAs($user)
+        ->patch(route('admin.pages.update', $page), [
+            'title' => 'Quiénes somos',
+            'slug' => 'quienes-somos',
+            'excerpt' => 'Equipo técnico.',
+            'content' => 'Contenido corporativo.',
+            'blocks' => [
+                'teamCoverImage' => '',
+                'teamMembers' => [
+                    [
+                        'name' => 'Javi A. Torres',
+                        'title' => 'Software Engineer',
+                        'handle' => 'javicodes',
+                        'status' => 'Online',
+                        'contactText' => 'Contactar',
+                        'avatarUrl' => '',
+                    ],
+                ],
+            ],
+            'team_cover_image_upload' => UploadedFile::fake()->image('equipo.jpg', 1440, 760),
+            'team_member_avatar_uploads' => [
+                UploadedFile::fake()->image('avatar.png', 400, 400),
+            ],
+            'seo_title' => '',
+            'seo_description' => '',
+            'og_image' => '',
+            'status' => 'published',
+            'published_at' => now()->format('Y-m-d H:i:s'),
+        ])
+        ->assertRedirect(route('admin.pages.index'));
+
+    $page->refresh();
+
+    expect($page->blocks['teamCoverImage'])->toEndWith('.webp')
+        ->and($page->blocks['teamMembers'][0]['avatarUrl'])->toEndWith('.png');
+
+    Storage::disk('public')->assertExists($page->blocks['teamCoverImage']);
+    Storage::disk('public')->assertExists($page->blocks['teamMembers'][0]['avatarUrl']);
+});
+
+test('page team blocks validate nested member data', function () {
+    $user = User::factory()->create();
+    $page = Page::factory()->published()->create([
+        'title' => 'Quiénes somos',
+        'slug' => 'quienes-somos',
+    ]);
+
+    $this->actingAs($user)
+        ->patch(route('admin.pages.update', $page), [
+            'title' => 'Quiénes somos',
+            'slug' => 'quienes-somos',
+            'excerpt' => 'Equipo técnico.',
+            'content' => 'Contenido corporativo.',
+            'blocks' => [
+                'teamCoverImage' => 'https://placehold.co/1440x760/163247/FFFFFF?text=Equipo',
+                'teamMembers' => [
+                    [
+                        'name' => '',
+                        'title' => 'Software Engineer',
+                    ],
+                ],
+            ],
+            'seo_title' => '',
+            'seo_description' => '',
+            'og_image' => '',
+            'status' => 'published',
+            'published_at' => now()->format('Y-m-d H:i:s'),
+        ])
+        ->assertSessionHasErrors(['blocks.teamMembers.0.name']);
+});
+
 test('pages index can filter by status and search', function () {
     $user = User::factory()->create();
 
@@ -324,6 +606,33 @@ test('success case can be created with generated slug and automatic publication 
 
     expect($successCase->published_at)->not->toBeNull()
         ->and($successCase->service_id)->toBe($service->id);
+});
+
+test('success case image upload is optimized to webp', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('admin.success-cases.store'), [
+            'title' => 'Caso con imagen',
+            'slug' => '',
+            'client_name' => 'Cliente',
+            'sector' => 'Industria',
+            'challenge' => 'Reto.',
+            'solution' => 'Solución.',
+            'result' => 'Resultado.',
+            'featured_image_upload' => UploadedFile::fake()->image('caso.jpg', 1200, 760),
+            'service_id' => null,
+            'status' => 'draft',
+            'published_at' => null,
+        ])
+        ->assertRedirect(route('admin.success-cases.index'));
+
+    $successCase = SuccessCase::query()->where('slug', 'caso-con-imagen')->firstOrFail();
+
+    expect($successCase->featured_image)->toEndWith('.webp');
+    Storage::disk('public')->assertExists($successCase->featured_image);
 });
 
 test('success case can be updated while ignoring its own slug uniqueness', function () {
@@ -414,6 +723,30 @@ test('testimonial can be created with featured order and status', function () {
         'sort_order' => 5,
         'status' => 'published',
     ]);
+});
+
+test('testimonial png avatar upload keeps png transparency format', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->post(route('admin.testimonials.store'), [
+            'name' => 'Cliente con avatar',
+            'position' => 'Directora',
+            'company' => 'Empresa Demo',
+            'quote' => 'Un testimonio con avatar.',
+            'avatar_upload' => UploadedFile::fake()->image('avatar.png', 300, 300),
+            'is_featured' => true,
+            'sort_order' => 5,
+            'status' => 'published',
+        ])
+        ->assertRedirect(route('admin.testimonials.index'));
+
+    $testimonial = Testimonial::query()->where('name', 'Cliente con avatar')->firstOrFail();
+
+    expect($testimonial->avatar)->toEndWith('.png');
+    Storage::disk('public')->assertExists($testimonial->avatar);
 });
 
 test('testimonial can be updated', function () {

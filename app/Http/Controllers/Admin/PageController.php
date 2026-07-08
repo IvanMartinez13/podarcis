@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePageRequest;
 use App\Http\Requests\UpdatePageRequest;
 use App\Models\Page;
+use App\Support\CmsImageStorage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,6 +15,8 @@ use Inertia\Response;
 
 class PageController extends Controller
 {
+    public function __construct(private CmsImageStorage $images) {}
+
     public function index(Request $request): Response
     {
         $filters = [
@@ -49,7 +52,24 @@ class PageController extends Controller
 
     public function store(StorePageRequest $request): RedirectResponse
     {
-        Page::query()->create($request->validated());
+        $data = $request->safe()->except([
+            'og_image_upload',
+            'remove_og_image',
+            'team_cover_image_upload',
+            'remove_team_cover_image',
+            'team_member_avatar_uploads',
+            'remove_team_member_avatars',
+        ]);
+
+        if ($request->hasFile('og_image_upload')) {
+            $data['og_image'] = $this->images->store($request->file('og_image_upload'), 'cms/pages');
+        } elseif (blank($data['og_image'] ?? null)) {
+            $data['og_image'] = null;
+        }
+
+        $data['blocks'] = $this->processBlocks($request, $data['blocks'] ?? null, null);
+
+        Page::query()->create($data);
 
         return to_route('admin.pages.index')->with('success', 'Página creada correctamente.');
     }
@@ -63,13 +83,36 @@ class PageController extends Controller
 
     public function update(UpdatePageRequest $request, Page $page): RedirectResponse
     {
-        $page->update($request->validated());
+        $data = $request->safe()->except([
+            'og_image_upload',
+            'remove_og_image',
+            'team_cover_image_upload',
+            'remove_team_cover_image',
+            'team_member_avatar_uploads',
+            'remove_team_member_avatars',
+        ]);
+
+        if ($request->hasFile('og_image_upload')) {
+            $data['og_image'] = $this->images->store($request->file('og_image_upload'), 'cms/pages', $page->og_image);
+        } elseif ($request->boolean('remove_og_image')) {
+            $this->images->delete($page->og_image);
+            $data['og_image'] = null;
+        } else {
+            unset($data['og_image']);
+        }
+
+        $data['blocks'] = $this->processBlocks($request, $data['blocks'] ?? null, $page->blocks);
+
+        $page->update($data);
 
         return to_route('admin.pages.index')->with('success', 'Página actualizada correctamente.');
     }
 
     public function destroy(Page $page): RedirectResponse
     {
+        $this->images->delete($page->og_image);
+        $this->deleteBlockImages($page->blocks);
+
         $page->delete();
 
         return to_route('admin.pages.index')->with('success', 'Página eliminada correctamente.');
@@ -101,9 +144,10 @@ class PageController extends Controller
             'slug' => $page->slug,
             'excerpt' => $page->excerpt,
             'content' => $page->content,
+            'blocks' => $this->displayBlocks($page->blocks),
             'seoTitle' => $page->seo_title,
             'seoDescription' => $page->seo_description,
-            'ogImage' => $page->og_image,
+            'ogImage' => $this->images->url($page->og_image),
             'status' => $page->status,
             'publishedAt' => $page->published_at?->format('Y-m-d\TH:i'),
             'previewUrl' => $page->status === 'published' ? $this->previewUrl($page) : null,
@@ -121,6 +165,7 @@ class PageController extends Controller
             'slug' => '',
             'excerpt' => '',
             'content' => '',
+            'blocks' => null,
             'seoTitle' => '',
             'seoDescription' => '',
             'ogImage' => '',
@@ -137,5 +182,118 @@ class PageController extends Controller
             'contacto' => route('contact.index'),
             default => null,
         };
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $blocks
+     * @param  array<string, mixed>|null  $oldBlocks
+     * @return array<string, mixed>|null
+     */
+    private function processBlocks(Request $request, ?array $blocks, ?array $oldBlocks): ?array
+    {
+        if ($blocks === null) {
+            return null;
+        }
+
+        $oldBlocks ??= [];
+        $oldTeamCoverImage = is_string($oldBlocks['teamCoverImage'] ?? null) ? $oldBlocks['teamCoverImage'] : null;
+
+        if ($request->hasFile('team_cover_image_upload')) {
+            $blocks['teamCoverImage'] = $this->images->store($request->file('team_cover_image_upload'), 'cms/pages/team', $oldTeamCoverImage);
+        } elseif ($request->boolean('remove_team_cover_image')) {
+            $this->images->delete($oldTeamCoverImage);
+            $blocks['teamCoverImage'] = null;
+        } elseif ($oldTeamCoverImage !== null) {
+            $blocks['teamCoverImage'] = $oldTeamCoverImage;
+        }
+
+        $oldMembers = is_array($oldBlocks['teamMembers'] ?? null) ? $oldBlocks['teamMembers'] : [];
+        $members = is_array($blocks['teamMembers'] ?? null) ? $blocks['teamMembers'] : [];
+
+        $blocks['teamMembers'] = collect($members)
+            ->map(function (array $member, int $index) use ($request, $oldMembers): array {
+                $oldMember = is_array($oldMembers[$index] ?? null) ? $oldMembers[$index] : [];
+                $oldAvatar = is_string($oldMember['avatarUrl'] ?? null) ? $oldMember['avatarUrl'] : null;
+                $avatarUploadPath = "team_member_avatar_uploads.{$index}";
+
+                if ($request->hasFile($avatarUploadPath)) {
+                    $member['avatarUrl'] = $this->images->store($request->file($avatarUploadPath), 'cms/pages/team/avatars', $oldAvatar, preservePng: true);
+                } elseif ((bool) data_get($request->input(), "remove_team_member_avatars.{$index}")) {
+                    $this->images->delete($oldAvatar);
+                    $member['avatarUrl'] = null;
+                } elseif ($oldAvatar !== null) {
+                    $member['avatarUrl'] = $oldAvatar;
+                }
+
+                return $member;
+            })
+            ->values()
+            ->all();
+
+        return $blocks;
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $blocks
+     * @return array<string, mixed>|null
+     */
+    private function displayBlocks(?array $blocks): ?array
+    {
+        if ($blocks === null) {
+            return null;
+        }
+
+        if (is_string($blocks['teamCoverImage'] ?? null)) {
+            $blocks['teamCoverImage'] = $this->images->url($blocks['teamCoverImage']);
+        }
+
+        $members = is_array($blocks['teamMembers'] ?? null) ? $blocks['teamMembers'] : [];
+
+        $blocks['teamMembers'] = collect($members)
+            ->map(function (array $member): array {
+                if (is_string($member['avatarUrl'] ?? null)) {
+                    $member['avatarUrl'] = $this->images->url($member['avatarUrl']);
+                }
+
+                return $this->teamMemberData($member);
+            })
+            ->values()
+            ->all();
+
+        return $blocks;
+    }
+
+    /**
+     * @param  array<string, mixed>|null  $blocks
+     */
+    private function deleteBlockImages(?array $blocks): void
+    {
+        if ($blocks === null) {
+            return;
+        }
+
+        $this->images->delete(is_string($blocks['teamCoverImage'] ?? null) ? $blocks['teamCoverImage'] : null);
+
+        foreach ($blocks['teamMembers'] ?? [] as $member) {
+            if (is_array($member)) {
+                $this->images->delete(is_string($member['avatarUrl'] ?? null) ? $member['avatarUrl'] : null);
+            }
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $member
+     * @return array<string, mixed>
+     */
+    private function teamMemberData(array $member): array
+    {
+        return [
+            'name' => $member['name'] ?? '',
+            'title' => $member['title'] ?? null,
+            'handle' => $member['handle'] ?? null,
+            'status' => $member['status'] ?? null,
+            'contactText' => $member['contactText'] ?? null,
+            'avatarUrl' => $member['avatarUrl'] ?? null,
+        ];
     }
 }

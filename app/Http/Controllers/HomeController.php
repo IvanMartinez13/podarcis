@@ -6,11 +6,14 @@ use App\Models\Post;
 use App\Models\Service;
 use App\Models\SuccessCase;
 use App\Models\Testimonial;
+use App\Support\CmsImageStorage;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class HomeController extends Controller
 {
+    public function __construct(private CmsImageStorage $images) {}
+
     public function index(): Response
     {
         return Inertia::render('welcome', [
@@ -33,7 +36,7 @@ class HomeController extends Controller
             'excerpt' => $service->excerpt,
             'description' => $service->description,
             'icon' => $service->icon,
-            'featuredImage' => $service->featured_image,
+            'featuredImage' => $this->images->url($service->featured_image),
             'href' => route('services.show', $service),
         ];
     }
@@ -47,7 +50,7 @@ class HomeController extends Controller
             'title' => $post->title,
             'slug' => $post->slug,
             'excerpt' => $post->excerpt,
-            'featuredImage' => $post->featured_image,
+            'featuredImage' => $this->images->url($post->featured_image),
             'publishedAt' => $post->published_at?->toDateString(),
             'href' => route('blog.show', $post),
             'category' => $post->category ? [
@@ -82,7 +85,7 @@ class HomeController extends Controller
             'sector' => $successCase->sector,
             'excerpt' => $successCase->challenge ?: $successCase->solution,
             'result' => $successCase->result,
-            'featuredImage' => $successCase->featured_image,
+            'featuredImage' => $this->images->url($successCase->featured_image),
             'href' => route('success-cases.show', $successCase),
             'service' => $successCase->service ? [
                 'title' => $successCase->service->title,

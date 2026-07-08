@@ -2,6 +2,7 @@ import { Link, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import { AdminFormSection } from '@/components/admin/admin-form-section';
 import { FormField } from '@/components/admin/form-field';
+import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import * as successCases from '@/routes/admin/success-cases';
@@ -33,12 +34,28 @@ type SuccessCaseFormProps = {
     mode: 'create' | 'edit';
 };
 
+type SuccessCaseFormPayload = {
+    title: string;
+    slug: string;
+    client_name: string;
+    sector: string;
+    challenge: string;
+    solution: string;
+    result: string;
+    featured_image: string;
+    featured_image_upload: File | null;
+    remove_featured_image: boolean;
+    service_id: string;
+    status: 'draft' | 'published';
+    published_at: string;
+};
+
 export function SuccessCaseForm({
     successCase,
     services,
     mode,
 }: SuccessCaseFormProps) {
-    const form = useForm({
+    const form = useForm<SuccessCaseFormPayload>({
         title: successCase.title,
         slug: successCase.slug,
         client_name: successCase.clientName ?? '',
@@ -47,6 +64,8 @@ export function SuccessCaseForm({
         solution: successCase.solution ?? '',
         result: successCase.result ?? '',
         featured_image: successCase.featuredImage ?? '',
+        featured_image_upload: null,
+        remove_featured_image: false,
         service_id: successCase.serviceId ? String(successCase.serviceId) : '',
         status: successCase.status,
         published_at: successCase.publishedAt ?? '',
@@ -56,12 +75,15 @@ export function SuccessCaseForm({
         event.preventDefault();
 
         if (mode === 'create') {
-            form.post(successCases.store().url);
+            form.post(successCases.store().url, { forceFormData: true });
 
             return;
         }
 
-        form.patch(successCases.update({ success_case: successCase.slug }).url);
+        form.transform((data) => ({ ...data, _method: 'patch' }));
+        form.post(successCases.update({ success_case: successCase.slug }).url, {
+            forceFormData: true,
+        });
     }
 
     return (
@@ -242,20 +264,23 @@ export function SuccessCaseForm({
                 title="Imagen"
                 description="Usaremos una URL externa o placeholder hasta incorporar media library."
             >
-                <FormField
-                    error={form.errors.featured_image}
-                    htmlFor="featured_image"
+                <ImageUploadField
+                    id="featured_image_upload"
                     label="Imagen destacada"
-                >
-                    <Input
-                        id="featured_image"
-                        placeholder="https://placehold.co/1200x700"
-                        value={form.data.featured_image}
-                        onChange={(event) =>
-                            form.setData('featured_image', event.target.value)
-                        }
-                    />
-                </FormField>
+                    currentImageUrl={successCase.featuredImage}
+                    error={
+                        form.errors.featured_image_upload ??
+                        form.errors.featured_image
+                    }
+                    progress={form.progress?.percentage ?? null}
+                    remove={form.data.remove_featured_image}
+                    onFileChange={(file) =>
+                        form.setData('featured_image_upload', file)
+                    }
+                    onRemoveChange={(remove) =>
+                        form.setData('remove_featured_image', remove)
+                    }
+                />
             </AdminFormSection>
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

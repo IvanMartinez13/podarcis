@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 type SectionProps = React.ComponentProps<'section'> & {
     eyebrow?: string;
     title?: string;
+    titleClassName?: string;
     description?: string;
     surface?: 'white' | 'muted' | 'navy';
 };
@@ -17,6 +18,7 @@ function Section({
     eyebrow,
     surface = 'white',
     title,
+    titleClassName,
     ...props
 }: SectionProps) {
     return (
@@ -47,6 +49,7 @@ function Section({
                                 className={cn(
                                     'mt-3 text-3xl font-semibold text-podarcis-navy sm:text-4xl',
                                     surface === 'navy' && 'text-white',
+                                    titleClassName,
                                 )}
                             >
                                 {title}

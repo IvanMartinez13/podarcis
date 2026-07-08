@@ -14,16 +14,19 @@ import {
     SheetTitle,
     SheetTrigger,
 } from '@/components/ui/sheet';
+import { cn } from '@/lib/utils';
 import { home, login } from '@/routes';
 import * as admin from '@/routes/admin';
 import * as blog from '@/routes/blog';
 import * as contact from '@/routes/contact';
+import * as legal from '@/routes/legal';
 import * as pages from '@/routes/pages';
 import * as services from '@/routes/services';
 import * as successCases from '@/routes/success-cases';
 import type { SharedPageProps } from '@/types';
 
 const navigation = [
+    { label: 'Inicio', href: home() },
     { label: 'Servicios', href: services.index() },
     { label: 'Quiénes somos', href: pages.about() },
     { label: 'Casos', href: successCases.index() },
@@ -31,21 +34,42 @@ const navigation = [
     { label: 'Contacto', href: contact.index() },
 ];
 
+const footerServices = [
+    {
+        label: 'Estudios ambientales',
+        href: `${services.index().url}#estudios-ambientales`,
+    },
+    {
+        label: 'Huella de carbono',
+        href: `${services.index().url}#huella-de-carbono`,
+    },
+    {
+        label: 'Sistemas de gestión',
+        href: `${services.index().url}#sistemas-de-gestion`,
+    },
+    {
+        label: 'Formación medioambiental',
+        href: `${services.index().url}#formacion-medioambiental`,
+    },
+];
+
 type BrandMarkProps = {
+    className?: string;
     inverse?: boolean;
 };
 
-function BrandMark({ inverse = false }: BrandMarkProps) {
+function BrandMark({ className, inverse = false }: BrandMarkProps) {
     const logo = inverse ? logoWhite : logoBlack;
 
     return (
         <span className="group/brand flex items-center gap-3">
             <span
-                className={
+                className={cn(
                     inverse
                         ? 'flex h-11 w-36 items-center rounded-md'
-                        : 'flex h-11 w-44 items-center transition duration-300 group-hover/brand:-translate-y-0.5'
-                }
+                        : 'flex h-11 w-44 items-center transition duration-300 group-hover/brand:-translate-y-0.5',
+                    className,
+                )}
             >
                 <img
                     alt="PODARCIS Consultores Auditores"
@@ -59,6 +83,7 @@ function BrandMark({ inverse = false }: BrandMarkProps) {
 
 function PublicLayout({ children }: PropsWithChildren) {
     const { auth } = usePage<SharedPageProps>().props;
+    const currentPath = normalizePath(usePage().url);
     const accountHref = auth.user ? admin.index() : login();
     const accountLabel = auth.user ? 'Panel' : 'Acceso';
 
@@ -73,7 +98,14 @@ function PublicLayout({ children }: PropsWithChildren) {
                     <nav className="hidden items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 p-1 text-sm font-medium text-podarcis-muted shadow-sm lg:flex">
                         {navigation.map((item) => (
                             <Link
-                                className="rounded-full px-4 py-2 transition duration-300 hover:bg-podarcis-surface hover:text-podarcis-navy focus-visible:ring-3 focus-visible:ring-podarcis-green/40 focus-visible:outline-none"
+                                className={cn(
+                                    'rounded-full px-4 py-2 transition duration-300 hover:bg-podarcis-surface hover:text-podarcis-navy focus-visible:ring-3 focus-visible:ring-podarcis-green/40 focus-visible:outline-none',
+                                    isActiveNavigationItem(
+                                        currentPath,
+                                        item.href.url,
+                                    ) &&
+                                        'bg-podarcis-navy text-white shadow-sm hover:bg-podarcis-navy hover:text-white',
+                                )}
                                 href={item.href}
                                 key={item.label}
                             >
@@ -120,7 +152,14 @@ function PublicLayout({ children }: PropsWithChildren) {
                                 {navigation.map((item) => (
                                     <SheetClose asChild key={item.label}>
                                         <Link
-                                            className="rounded-md px-3 py-3 text-sm font-medium text-podarcis-navy transition hover:bg-podarcis-surface"
+                                            className={cn(
+                                                'rounded-md px-3 py-3 text-sm font-medium text-podarcis-navy transition hover:bg-podarcis-surface',
+                                                isActiveNavigationItem(
+                                                    currentPath,
+                                                    item.href.url,
+                                                ) &&
+                                                    'bg-podarcis-navy text-white hover:bg-podarcis-navy',
+                                            )}
                                             href={item.href}
                                         >
                                             {item.label}
@@ -156,7 +195,7 @@ function PublicLayout({ children }: PropsWithChildren) {
                 <Container className="py-12">
                     <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr]">
                         <div>
-                            <BrandMark inverse />
+                            <BrandMark inverse className="h-16 w-52" />
                             <p className="mt-5 max-w-md text-sm leading-6 text-white/70">
                                 Consultoría ambiental, calidad, sostenibilidad,
                                 seguridad y salud con apoyo de herramientas
@@ -168,10 +207,16 @@ function PublicLayout({ children }: PropsWithChildren) {
                                 Servicios
                             </h2>
                             <ul className="mt-4 grid gap-2 text-sm text-white/70">
-                                <li>Estudios ambientales</li>
-                                <li>Huella de carbono</li>
-                                <li>Sistemas de gestion</li>
-                                <li>Formacion medioambiental</li>
+                                {footerServices.map((item) => (
+                                    <li key={item.label}>
+                                        <Link
+                                            className="transition hover:text-white"
+                                            href={item.href}
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    </li>
+                                ))}
                             </ul>
                         </div>
                         <div>
@@ -193,13 +238,26 @@ function PublicLayout({ children }: PropsWithChildren) {
                         </div>
                         <div>
                             <h2 className="text-sm font-semibold text-podarcis-green">
-                                Contacto
+                                Legal
                             </h2>
-                            <p className="mt-4 text-sm leading-6 text-white/70">
-                                Cuéntanos qué obligación, auditoría o proyecto
-                                necesitas resolver y preparamos el siguiente
-                                paso.
-                            </p>
+                            <ul className="mt-4 grid gap-2 text-sm">
+                                <li>
+                                    <Link
+                                        className="text-white/70 transition hover:text-white"
+                                        href={legal.privacy()}
+                                    >
+                                        Política de privacidad
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
+                                        className="text-white/70 transition hover:text-white"
+                                        href={legal.cookies()}
+                                    >
+                                        Política de cookies
+                                    </Link>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                     <div className="mt-10 border-t border-white/10 pt-6 text-sm text-white/55">
@@ -212,3 +270,19 @@ function PublicLayout({ children }: PropsWithChildren) {
 }
 
 export default PublicLayout;
+
+function normalizePath(url: string): string {
+    const [path] = url.split(/[?#]/);
+
+    return path.replace(/\/$/, '') || '/';
+}
+
+function isActiveNavigationItem(currentPath: string, itemUrl: string): boolean {
+    const itemPath = normalizePath(itemUrl);
+
+    if (itemPath === '/') {
+        return currentPath === '/';
+    }
+
+    return currentPath === itemPath || currentPath.startsWith(`${itemPath}/`);
+}

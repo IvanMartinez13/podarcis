@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
+use App\Support\CmsImageStorage;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class BlogController extends Controller
 {
+    public function __construct(private CmsImageStorage $images) {}
+
     public function index(): Response
     {
         return Inertia::render('blog/index', [
@@ -43,7 +46,7 @@ class BlogController extends Controller
             'title' => $post->title,
             'slug' => $post->slug,
             'excerpt' => $post->excerpt,
-            'featuredImage' => $post->featured_image,
+            'featuredImage' => $this->images->url($post->featured_image),
             'publishedAt' => $post->published_at?->toDateString(),
             'href' => route('blog.show', $post),
             'category' => $post->category ? [

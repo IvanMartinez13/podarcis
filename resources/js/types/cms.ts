@@ -56,11 +56,26 @@ export type CmsTestimonial = {
     quote: string;
 };
 
+export type TeamMember = {
+    name: string;
+    title: string | null;
+    handle: string | null;
+    status: string | null;
+    contactText: string | null;
+    avatarUrl: string | null;
+};
+
+export type PageBlocks = {
+    teamCoverImage?: string | null;
+    teamMembers?: TeamMember[];
+};
+
 export type CmsPage = {
     title: string;
     slug?: string;
     excerpt: string | null;
     content: string | null;
+    blocks?: PageBlocks | null;
     seoTitle?: string | null;
     seoDescription?: string | null;
 };

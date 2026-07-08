@@ -18,6 +18,8 @@ class ContactController extends Controller
         $page = Page::query()->published()->where('slug', 'contacto')->first();
         $services = Service::query()->published()->ordered()->get(['id', 'title', 'slug']);
         $selectedService = $services->firstWhere('slug', $request->string('service')->toString());
+        $source = $request->string('source')->toString();
+        $worker = $request->string('worker')->toString();
 
         return Inertia::render('contact/index', [
             'page' => $page ? [
@@ -27,6 +29,7 @@ class ContactController extends Controller
             ] : null,
             'services' => $services,
             'selectedServiceId' => $selectedService?->id,
+            'contactSource' => $source === 'team_card' && $worker !== '' ? "team_card:{$worker}" : null,
             'turnstileSiteKey' => config('services.turnstile.site_key'),
         ]);
     }

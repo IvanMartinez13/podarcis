@@ -2,6 +2,7 @@ import { Link, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import { AdminFormSection } from '@/components/admin/admin-form-section';
 import { FormField } from '@/components/admin/form-field';
+import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -28,14 +29,33 @@ type ServiceFormProps = {
     mode: 'create' | 'edit';
 };
 
+type ServiceFormPayload = {
+    title: string;
+    slug: string;
+    excerpt: string;
+    description: string;
+    icon: string;
+    featured_image: string;
+    featured_image_upload: File | null;
+    remove_featured_image: boolean;
+    seo_title: string;
+    seo_description: string;
+    is_featured: boolean;
+    sort_order: number;
+    status: 'draft' | 'published';
+    published_at: string;
+};
+
 export function ServiceForm({ service, mode }: ServiceFormProps) {
-    const form = useForm({
+    const form = useForm<ServiceFormPayload>({
         title: service.title,
         slug: service.slug,
         excerpt: service.excerpt ?? '',
         description: service.description ?? '',
         icon: service.icon ?? '',
         featured_image: service.featuredImage ?? '',
+        featured_image_upload: null,
+        remove_featured_image: false,
         seo_title: service.seoTitle ?? '',
         seo_description: service.seoDescription ?? '',
         is_featured: service.isFeatured,
@@ -48,12 +68,15 @@ export function ServiceForm({ service, mode }: ServiceFormProps) {
         event.preventDefault();
 
         if (mode === 'create') {
-            form.post(services.store().url);
+            form.post(services.store().url, { forceFormData: true });
 
             return;
         }
 
-        form.patch(services.update({ service: service.slug }).url);
+        form.transform((data) => ({ ...data, _method: 'patch' }));
+        form.post(services.update({ service: service.slug }).url, {
+            forceFormData: true,
+        });
     }
 
     return (
@@ -211,23 +234,23 @@ export function ServiceForm({ service, mode }: ServiceFormProps) {
                             }
                         />
                     </FormField>
-                    <FormField
-                        error={form.errors.featured_image}
-                        htmlFor="featured_image"
+                    <ImageUploadField
+                        id="featured_image_upload"
                         label="Imagen destacada"
-                    >
-                        <Input
-                            id="featured_image"
-                            placeholder="https://placehold.co/1200x700"
-                            value={form.data.featured_image}
-                            onChange={(event) =>
-                                form.setData(
-                                    'featured_image',
-                                    event.target.value,
-                                )
-                            }
-                        />
-                    </FormField>
+                        currentImageUrl={service.featuredImage}
+                        error={
+                            form.errors.featured_image_upload ??
+                            form.errors.featured_image
+                        }
+                        progress={form.progress?.percentage ?? null}
+                        remove={form.data.remove_featured_image}
+                        onFileChange={(file) =>
+                            form.setData('featured_image_upload', file)
+                        }
+                        onRemoveChange={(remove) =>
+                            form.setData('remove_featured_image', remove)
+                        }
+                    />
                     <FormField
                         error={form.errors.seo_title}
                         htmlFor="seo_title"

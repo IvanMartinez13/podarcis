@@ -2,6 +2,7 @@ import { Link, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import { AdminFormSection } from '@/components/admin/admin-form-section';
 import { FormField } from '@/components/admin/form-field';
+import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { SeoCounter } from '@/components/admin/seo-counter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,13 +34,30 @@ type PostFormProps = {
     mode: 'create' | 'edit';
 };
 
+type PostFormPayload = {
+    title: string;
+    slug: string;
+    excerpt: string;
+    content: string;
+    featured_image: string;
+    featured_image_upload: File | null;
+    remove_featured_image: boolean;
+    category_id: string;
+    seo_title: string;
+    seo_description: string;
+    status: 'draft' | 'published';
+    published_at: string;
+};
+
 export function PostForm({ post, categories, mode }: PostFormProps) {
-    const form = useForm({
+    const form = useForm<PostFormPayload>({
         title: post.title,
         slug: post.slug,
         excerpt: post.excerpt ?? '',
         content: post.content ?? '',
         featured_image: post.featuredImage ?? '',
+        featured_image_upload: null,
+        remove_featured_image: false,
         category_id: post.categoryId ? String(post.categoryId) : '',
         seo_title: post.seoTitle ?? '',
         seo_description: post.seoDescription ?? '',
@@ -51,12 +69,15 @@ export function PostForm({ post, categories, mode }: PostFormProps) {
         event.preventDefault();
 
         if (mode === 'create') {
-            form.post(posts.store().url);
+            form.post(posts.store().url, { forceFormData: true });
 
             return;
         }
 
-        form.patch(posts.update({ post: post.slug }).url);
+        form.transform((data) => ({ ...data, _method: 'patch' }));
+        form.post(posts.update({ post: post.slug }).url, {
+            forceFormData: true,
+        });
     }
 
     return (
@@ -193,20 +214,23 @@ export function PostForm({ post, categories, mode }: PostFormProps) {
                 title="SEO e imagen"
                 description="Metadatos públicos y placeholder de imagen hasta incorporar media library."
             >
-                <FormField
-                    error={form.errors.featured_image}
-                    htmlFor="featured_image"
+                <ImageUploadField
+                    id="featured_image_upload"
                     label="Imagen destacada"
-                >
-                    <Input
-                        id="featured_image"
-                        placeholder="https://placehold.co/1200x700"
-                        value={form.data.featured_image}
-                        onChange={(event) =>
-                            form.setData('featured_image', event.target.value)
-                        }
-                    />
-                </FormField>
+                    currentImageUrl={post.featuredImage}
+                    error={
+                        form.errors.featured_image_upload ??
+                        form.errors.featured_image
+                    }
+                    progress={form.progress?.percentage ?? null}
+                    remove={form.data.remove_featured_image}
+                    onFileChange={(file) =>
+                        form.setData('featured_image_upload', file)
+                    }
+                    onRemoveChange={(remove) =>
+                        form.setData('remove_featured_image', remove)
+                    }
+                />
                 <FormField
                     error={form.errors.seo_title}
                     htmlFor="seo_title"

@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialControll
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LegalPageController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SuccessCaseController;
@@ -24,6 +25,8 @@ Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.sho
 Route::get('/casos-de-exito', [SuccessCaseController::class, 'index'])->name('success-cases.index');
 Route::get('/casos-de-exito/{successCase:slug}', [SuccessCaseController::class, 'show'])->name('success-cases.show');
 Route::get('/quienes-somos', [PageController::class, 'about'])->name('pages.about');
+Route::get('/politica-de-privacidad', [LegalPageController::class, 'privacy'])->name('legal.privacy');
+Route::get('/politica-de-cookies', [LegalPageController::class, 'cookies'])->name('legal.cookies');
 Route::get('/contacto', [ContactController::class, 'index'])->name('contact.index');
 Route::post('/contacto', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
 
