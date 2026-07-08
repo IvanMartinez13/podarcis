@@ -21,6 +21,8 @@ import { cn } from '@/lib/utils';
 import { home, logout } from '@/routes';
 import * as admin from '@/routes/admin';
 import * as categories from '@/routes/admin/categories';
+import * as pages from '@/routes/admin/pages';
+import * as posts from '@/routes/admin/posts';
 import * as services from '@/routes/admin/services';
 import type { SharedPageProps } from '@/types';
 
@@ -49,13 +51,13 @@ const navItems: AdminNavItem[] = [
     },
     {
         title: 'Posts',
+        href: posts.index(),
         icon: Newspaper,
-        disabled: true,
     },
     {
         title: 'Páginas',
+        href: pages.index(),
         icon: FileText,
-        disabled: true,
     },
     {
         title: 'Casos',

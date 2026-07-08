@@ -9,14 +9,19 @@ import {
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { Button } from '@/components/ui/button';
 import * as categories from '@/routes/admin/categories';
+import * as pages from '@/routes/admin/pages';
+import * as posts from '@/routes/admin/posts';
 import * as services from '@/routes/admin/services';
 
 type DashboardProps = {
     stats: {
         services: number;
         posts: number;
+        publishedPosts: number;
+        draftPosts: number;
         newLeads: number;
         publishedPages: number;
+        draftPages: number;
     };
 };
 
@@ -28,7 +33,17 @@ const statCards = [
     },
     {
         key: 'posts',
-        label: 'Posts',
+        label: 'Posts totales',
+        icon: Newspaper,
+    },
+    {
+        key: 'publishedPosts',
+        label: 'Posts publicados',
+        icon: Newspaper,
+    },
+    {
+        key: 'draftPosts',
+        label: 'Posts borrador',
         icon: Newspaper,
     },
     {
@@ -39,6 +54,11 @@ const statCards = [
     {
         key: 'publishedPages',
         label: 'Páginas publicadas',
+        icon: FileText,
+    },
+    {
+        key: 'draftPages',
+        label: 'Páginas borrador',
         icon: FileText,
     },
 ] as const;
@@ -110,6 +130,26 @@ export default function AdminIndex({ stats }: DashboardProps) {
                                     Nueva categoría
                                 </Link>
                             </Button>
+                            <Button
+                                asChild
+                                className="justify-start"
+                                variant="outline"
+                            >
+                                <Link href={posts.create()}>
+                                    <Plus className="size-4" />
+                                    Nuevo post
+                                </Link>
+                            </Button>
+                            <Button
+                                asChild
+                                className="justify-start"
+                                variant="outline"
+                            >
+                                <Link href={pages.create()}>
+                                    <Plus className="size-4" />
+                                    Nueva página
+                                </Link>
+                            </Button>
                         </div>
                     </article>
 
@@ -118,9 +158,9 @@ export default function AdminIndex({ stats }: DashboardProps) {
                             Próxima fase
                         </h2>
                         <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
-                            Posts, páginas, casos, testimonios y leads ya están
-                            visibles en navegación para preparar el flujo, pero
-                            sus CRUD quedan bloqueados hasta la siguiente fase.
+                            Casos, testimonios y leads siguen visibles en
+                            navegación para preparar el flujo, pero sus CRUD
+                            quedan bloqueados hasta la siguiente fase.
                         </p>
                     </article>
                 </section>

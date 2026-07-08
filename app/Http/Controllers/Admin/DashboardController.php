@@ -18,8 +18,11 @@ class DashboardController extends Controller
             'stats' => [
                 'services' => Service::query()->count(),
                 'posts' => Post::query()->count(),
+                'publishedPosts' => Post::query()->where('status', 'published')->count(),
+                'draftPosts' => Post::query()->where('status', 'draft')->count(),
                 'newLeads' => Lead::query()->where('status', 'new')->count(),
                 'publishedPages' => Page::query()->published()->count(),
+                'draftPages' => Page::query()->where('status', 'draft')->count(),
             ],
         ]);
     }

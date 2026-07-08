@@ -1,0 +1,58 @@
+<?php
+
+namespace App\Http\Requests;
+
+use App\Models\Post;
+use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+
+class UpdatePostRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $title = (string) $this->input('title');
+        $slug = (string) $this->input('slug');
+        $status = (string) $this->input('status', 'draft');
+
+        $this->merge([
+            'slug' => Str::slug($slug !== '' ? $slug : $title),
+            'published_at' => $status === 'published' && blank($this->input('published_at'))
+                ? now()
+                : $this->input('published_at'),
+        ]);
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        /** @var Post $post */
+        $post = $this->route('post');
+
+        return [
+            'title' => ['required', 'string', 'max:255'],
+            'slug' => ['required', 'string', 'max:255', Rule::unique('posts', 'slug')->ignore($post->id)],
+            'excerpt' => ['nullable', 'string'],
+            'content' => ['required', 'string'],
+            'featured_image' => ['nullable', 'string', 'max:255'],
+            'category_id' => ['nullable', 'integer', Rule::exists('categories', 'id')->where('type', 'post')],
+            'seo_title' => ['nullable', 'string', 'max:255'],
+            'seo_description' => ['nullable', 'string'],
+            'status' => ['required', 'string', Rule::in(['draft', 'published'])],
+            'published_at' => ['nullable', 'date'],
+        ];
+    }
+}
