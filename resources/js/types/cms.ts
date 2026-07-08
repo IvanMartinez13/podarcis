@@ -37,6 +37,7 @@ export type CmsSuccessCase = {
     slug: string;
     clientName: string | null;
     sector: string | null;
+    excerpt?: string | null;
     challenge?: string | null;
     solution?: string | null;
     result: string | null;

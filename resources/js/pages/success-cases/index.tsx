@@ -1,4 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
+import { ArrowRight } from 'lucide-react';
 
 import { EmptyState } from '@/components/public/empty-state';
 import { Section } from '@/components/public/section';
@@ -39,15 +40,35 @@ export default function SuccessCasesIndex({
                                     }
                                 />
                                 <div className="p-6">
-                                    <Badge className="bg-podarcis-green text-podarcis-navy">
-                                        {successCase.sector ?? 'Proyecto'}
-                                    </Badge>
+                                    <div className="flex flex-wrap gap-2">
+                                        <Badge className="bg-podarcis-green text-podarcis-navy">
+                                            {successCase.sector ?? 'Proyecto'}
+                                        </Badge>
+                                        {successCase.service && (
+                                            <Badge className="bg-podarcis-surface text-podarcis-navy">
+                                                {successCase.service.title}
+                                            </Badge>
+                                        )}
+                                    </div>
                                     <h2 className="mt-4 text-2xl font-semibold text-podarcis-navy">
                                         {successCase.title}
                                     </h2>
+                                    {successCase.clientName && (
+                                        <p className="mt-2 text-sm font-semibold text-podarcis-muted">
+                                            {successCase.clientName}
+                                        </p>
+                                    )}
                                     <p className="mt-3 leading-7 text-podarcis-muted">
-                                        {successCase.result}
+                                        {successCase.excerpt ??
+                                            successCase.result}
                                     </p>
+                                    <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-podarcis-navy transition-colors group-hover:text-podarcis-green">
+                                        Ver caso
+                                        <ArrowRight
+                                            className="size-4 transition-transform group-hover:translate-x-1"
+                                            aria-hidden="true"
+                                        />
+                                    </span>
                                 </div>
                             </Link>
                         ))}

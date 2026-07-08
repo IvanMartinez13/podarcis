@@ -32,8 +32,11 @@ class ServiceController extends Controller
             'successCases' => $service->successCases->map(fn (SuccessCase $successCase): array => [
                 'title' => $successCase->title,
                 'slug' => $successCase->slug,
+                'clientName' => $successCase->client_name,
                 'sector' => $successCase->sector,
+                'excerpt' => $successCase->challenge ?: $successCase->solution,
                 'result' => $successCase->result,
+                'featuredImage' => $successCase->featured_image,
                 'href' => route('success-cases.show', $successCase),
             ]),
         ]);

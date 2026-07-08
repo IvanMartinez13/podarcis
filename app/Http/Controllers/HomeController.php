@@ -80,6 +80,7 @@ class HomeController extends Controller
             'slug' => $successCase->slug,
             'clientName' => $successCase->client_name,
             'sector' => $successCase->sector,
+            'excerpt' => $successCase->challenge ?: $successCase->solution,
             'result' => $successCase->result,
             'featuredImage' => $successCase->featured_image,
             'href' => route('success-cases.show', $successCase),

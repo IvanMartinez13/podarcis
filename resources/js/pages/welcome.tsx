@@ -284,7 +284,7 @@ export default function Welcome({
                                     {successCase.title}
                                 </h3>
                                 <p className="mt-4 leading-7 text-white/70">
-                                    {successCase.result}
+                                    {successCase.excerpt ?? successCase.result}
                                 </p>
                             </Link>
                         ))}

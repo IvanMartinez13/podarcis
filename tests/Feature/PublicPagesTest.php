@@ -7,7 +7,20 @@ use App\Models\Post;
 use App\Models\Service;
 use App\Models\SuccessCase;
 use App\Models\Testimonial;
+use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
+
+beforeEach(function () {
+    config()->set('services.turnstile.site_key', 'test-site-key');
+    config()->set('services.turnstile.secret_key', 'test-secret-key');
+});
+
+function fakePublicTurnstileVerification(bool $success = true): void
+{
+    Http::fake([
+        'https://challenges.cloudflare.com/turnstile/v0/siteverify' => Http::response(['success' => $success]),
+    ]);
+}
 
 test('home renders with dynamic cms props', function () {
     Service::factory()->published()->featured()->ordered(10)->create(['title' => 'Servicio destacado']);
@@ -61,17 +74,25 @@ test('blog index and show expose only published posts', function () {
 });
 
 test('success cases index and show expose only published cases', function () {
-    $published = SuccessCase::factory()->published()->create(['title' => 'Caso publicado']);
-    $draft = SuccessCase::factory()->create(['title' => 'Caso borrador']);
+    $service = Service::factory()->published()->create();
+    $published = SuccessCase::factory()->published()->for($service)->create(['title' => 'Caso publicado']);
+    $related = SuccessCase::factory()->published()->for($service)->create(['title' => 'Caso relacionado']);
+    $draft = SuccessCase::factory()->for($service)->create(['title' => 'Caso borrador']);
 
     $this->get(route('success-cases.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('success-cases/index')
-            ->has('successCases', 1)
-            ->where('successCases.0.title', 'Caso publicado'));
+            ->has('successCases', 2));
 
-    $this->get(route('success-cases.show', $published))->assertOk();
+    $this->get(route('success-cases.show', $published))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('success-cases/show')
+            ->where('successCase.title', 'Caso publicado')
+            ->has('relatedSuccessCases', 1)
+            ->where('relatedSuccessCases.0.title', 'Caso relacionado'));
+
     $this->get(route('success-cases.show', $draft))->assertNotFound();
 });
 
@@ -89,22 +110,29 @@ test('about page loads the published quienes somos page', function () {
 });
 
 test('contact page loads published services', function () {
-    Service::factory()->published()->ordered(10)->create(['title' => 'Servicio publicado']);
+    $service = Service::factory()->published()->ordered(10)->create([
+        'title' => 'Servicio publicado',
+        'slug' => 'servicio-publicado',
+    ]);
     Service::factory()->create(['title' => 'Servicio borrador']);
 
-    $this->get(route('contact.index'))
+    $this->get(route('contact.index', ['service' => $service->slug]))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('contact/index')
             ->has('services', 1)
-            ->where('services.0.title', 'Servicio publicado'));
+            ->where('services.0.title', 'Servicio publicado')
+            ->where('selectedServiceId', $service->id)
+            ->where('turnstileSiteKey', 'test-site-key'));
 });
 
 test('contact form validates input and creates a lead', function () {
+    fakePublicTurnstileVerification();
+
     $service = Service::factory()->published()->create();
 
     $this->post(route('contact.store'), [])
-        ->assertSessionHasErrors(['name', 'email', 'message']);
+        ->assertSessionHasErrors(['name', 'email', 'message', 'privacy_accepted', 'cf_turnstile_response']);
 
     $this->post(route('contact.store'), [
         'name' => 'Ivan Martinez',
@@ -113,6 +141,8 @@ test('contact form validates input and creates a lead', function () {
         'company' => 'PODARCIS',
         'service_id' => $service->id,
         'message' => 'Necesito ayuda con un proyecto ambiental.',
+        'privacy_accepted' => '1',
+        'cf_turnstile_response' => 'valid-turnstile-token',
     ])->assertRedirect();
 
     expect(Lead::query()->count())->toBe(1);
@@ -120,6 +150,36 @@ test('contact form validates input and creates a lead', function () {
         'name' => 'Ivan Martinez',
         'email' => 'ivan@example.com',
         'service_id' => $service->id,
-        'source' => 'contacto',
+        'source' => 'contact_page',
+        'status' => 'new',
     ]);
+});
+
+test('contact honeypot blocks spam submissions', function () {
+    fakePublicTurnstileVerification();
+
+    $this->post(route('contact.store'), [
+        'name' => 'Spam Bot',
+        'email' => 'spam@example.com',
+        'message' => 'Este mensaje tiene longitud suficiente.',
+        'privacy_accepted' => '1',
+        'cf_turnstile_response' => 'valid-turnstile-token',
+        'website' => 'https://spam.example',
+    ])->assertSessionHasErrors(['website']);
+
+    expect(Lead::query()->count())->toBe(0);
+});
+
+test('contact form rejects invalid turnstile verification', function () {
+    fakePublicTurnstileVerification(false);
+
+    $this->post(route('contact.store'), [
+        'name' => 'Ivan Martinez',
+        'email' => 'ivan@example.com',
+        'message' => 'Necesito ayuda con un proyecto ambiental.',
+        'privacy_accepted' => '1',
+        'cf_turnstile_response' => 'invalid-turnstile-token',
+    ])->assertSessionHasErrors(['cf_turnstile_response']);
+
+    expect(Lead::query()->count())->toBe(0);
 });

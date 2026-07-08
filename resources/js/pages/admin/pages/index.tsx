@@ -1,7 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Edit3, Eye, Plus, Search, Trash2 } from 'lucide-react';
+import { Edit3, Eye, Plus, Search } from 'lucide-react';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { AdminTable } from '@/components/admin/admin-table';
+import { ConfirmDeleteDialog } from '@/components/admin/confirm-delete-dialog';
 import { StatusBadge } from '@/components/admin/status-badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,10 +42,6 @@ export default function PagesIndex({ pages: items, filters }: PagesIndexProps) {
     }
 
     function destroyPage(page: AdminPage) {
-        if (!window.confirm(`¿Eliminar la página "${page.title}"?`)) {
-            return;
-        }
-
         router.delete(pages.destroy({ page: page.id }).url, {
             preserveScroll: true,
         });
@@ -147,15 +144,11 @@ export default function PagesIndex({ pages: items, filters }: PagesIndexProps) {
                                             Editar
                                         </Link>
                                     </Button>
-                                    <Button
-                                        onClick={() => destroyPage(page)}
-                                        size="sm"
-                                        type="button"
-                                        variant="destructive"
-                                    >
-                                        <Trash2 className="size-4" />
-                                        Eliminar
-                                    </Button>
+                                    <ConfirmDeleteDialog
+                                        title="Eliminar página"
+                                        description={`¿Seguro que quieres eliminar "${page.title}"? Esta acción no se puede deshacer.`}
+                                        onConfirm={() => destroyPage(page)}
+                                    />
                                 </div>
                             </td>
                         </tr>

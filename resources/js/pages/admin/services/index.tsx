@@ -1,7 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Edit3, Plus, Trash2 } from 'lucide-react';
+import { Edit3, Plus } from 'lucide-react';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { AdminTable } from '@/components/admin/admin-table';
+import { ConfirmDeleteDialog } from '@/components/admin/confirm-delete-dialog';
 import { StatusBadge } from '@/components/admin/status-badge';
 import { Button } from '@/components/ui/button';
 import * as services from '@/routes/admin/services';
@@ -22,10 +23,6 @@ type ServicesIndexProps = {
 
 export default function ServicesIndex({ services: items }: ServicesIndexProps) {
     function destroyService(service: AdminService) {
-        if (!window.confirm(`¿Eliminar el servicio "${service.title}"?`)) {
-            return;
-        }
-
         router.delete(services.destroy({ service: service.slug }).url, {
             preserveScroll: true,
         });
@@ -101,15 +98,13 @@ export default function ServicesIndex({ services: items }: ServicesIndexProps) {
                                             Editar
                                         </Link>
                                     </Button>
-                                    <Button
-                                        onClick={() => destroyService(service)}
-                                        size="sm"
-                                        type="button"
-                                        variant="destructive"
-                                    >
-                                        <Trash2 className="size-4" />
-                                        Eliminar
-                                    </Button>
+                                    <ConfirmDeleteDialog
+                                        title="Eliminar servicio"
+                                        description={`¿Seguro que quieres eliminar "${service.title}"? Esta acción no se puede deshacer.`}
+                                        onConfirm={() =>
+                                            destroyService(service)
+                                        }
+                                    />
                                 </div>
                             </td>
                         </tr>

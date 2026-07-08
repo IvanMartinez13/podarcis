@@ -11,7 +11,12 @@ class SuccessCaseController extends Controller
     public function index(): Response
     {
         return Inertia::render('success-cases/index', [
-            'successCases' => SuccessCase::query()->published()->with('service')->latest('published_at')->get()->map(fn (SuccessCase $successCase): array => $this->summary($successCase)),
+            'successCases' => SuccessCase::query()
+                ->published()
+                ->with('service')
+                ->latest('published_at')
+                ->get()
+                ->map(fn (SuccessCase $successCase): array => $this->summary($successCase)),
         ]);
     }
 
@@ -26,7 +31,19 @@ class SuccessCaseController extends Controller
                 ...$this->summary($successCase),
                 'challenge' => $successCase->challenge,
                 'solution' => $successCase->solution,
+                'result' => $successCase->result,
             ],
+            'relatedSuccessCases' => $successCase->service_id
+                ? SuccessCase::query()
+                    ->published()
+                    ->with('service')
+                    ->where('service_id', $successCase->service_id)
+                    ->whereKeyNot($successCase->id)
+                    ->latest('published_at')
+                    ->limit(3)
+                    ->get()
+                    ->map(fn (SuccessCase $relatedCase): array => $this->summary($relatedCase))
+                : [],
         ]);
     }
 
@@ -40,6 +57,7 @@ class SuccessCaseController extends Controller
             'slug' => $successCase->slug,
             'clientName' => $successCase->client_name,
             'sector' => $successCase->sector,
+            'excerpt' => $successCase->challenge ?: $successCase->solution,
             'result' => $successCase->result,
             'featuredImage' => $successCase->featured_image,
             'href' => route('success-cases.show', $successCase),

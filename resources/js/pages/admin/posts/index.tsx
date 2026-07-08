@@ -1,7 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Edit3, Eye, Plus, Search, Trash2 } from 'lucide-react';
+import { Edit3, Eye, Plus, Search } from 'lucide-react';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { AdminTable } from '@/components/admin/admin-table';
+import { ConfirmDeleteDialog } from '@/components/admin/confirm-delete-dialog';
 import { StatusBadge } from '@/components/admin/status-badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,10 +55,6 @@ export default function PostsIndex({
     }
 
     function destroyPost(post: AdminPost) {
-        if (!window.confirm(`¿Eliminar el post "${post.title}"?`)) {
-            return;
-        }
-
         router.delete(posts.destroy({ post: post.slug }).url, {
             preserveScroll: true,
         });
@@ -187,15 +184,11 @@ export default function PostsIndex({
                                             Editar
                                         </Link>
                                     </Button>
-                                    <Button
-                                        onClick={() => destroyPost(post)}
-                                        size="sm"
-                                        type="button"
-                                        variant="destructive"
-                                    >
-                                        <Trash2 className="size-4" />
-                                        Eliminar
-                                    </Button>
+                                    <ConfirmDeleteDialog
+                                        title="Eliminar post"
+                                        description={`¿Seguro que quieres eliminar "${post.title}"? Esta acción no se puede deshacer.`}
+                                        onConfirm={() => destroyPost(post)}
+                                    />
                                 </div>
                             </td>
                         </tr>

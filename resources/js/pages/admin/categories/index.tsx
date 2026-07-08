@@ -1,7 +1,8 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Edit3, Plus, Trash2 } from 'lucide-react';
+import { Edit3, Plus } from 'lucide-react';
 import { AdminPageHeader } from '@/components/admin/admin-page-header';
 import { AdminTable } from '@/components/admin/admin-table';
+import { ConfirmDeleteDialog } from '@/components/admin/confirm-delete-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import * as categories from '@/routes/admin/categories';
@@ -22,10 +23,6 @@ export default function CategoriesIndex({
     categories: items,
 }: CategoriesIndexProps) {
     function destroyCategory(category: AdminCategory) {
-        if (!window.confirm(`¿Eliminar la categoría "${category.name}"?`)) {
-            return;
-        }
-
         router.delete(categories.destroy({ category: category.id }).url, {
             preserveScroll: true,
         });
@@ -92,17 +89,13 @@ export default function CategoriesIndex({
                                             Editar
                                         </Link>
                                     </Button>
-                                    <Button
-                                        onClick={() =>
+                                    <ConfirmDeleteDialog
+                                        title="Eliminar categoría"
+                                        description={`¿Seguro que quieres eliminar "${category.name}"? Esta acción no se puede deshacer.`}
+                                        onConfirm={() =>
                                             destroyCategory(category)
                                         }
-                                        size="sm"
-                                        type="button"
-                                        variant="destructive"
-                                    >
-                                        <Trash2 className="size-4" />
-                                        Eliminar
-                                    </Button>
+                                    />
                                 </div>
                             </td>
                         </tr>

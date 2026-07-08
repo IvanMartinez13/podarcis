@@ -52,7 +52,11 @@ export default function ServiceShow({
                                 asChild
                                 className="bg-podarcis-green text-podarcis-navy"
                             >
-                                <Link href={contact.index()}>
+                                <Link
+                                    href={contact.index({
+                                        query: { service: service.slug },
+                                    })}
+                                >
                                     Solicitar asesoramiento
                                     <ArrowRight
                                         className="size-4"
@@ -143,7 +147,7 @@ export default function ServiceShow({
                                     {successCase.title}
                                 </h3>
                                 <p className="mt-3 text-sm leading-6 text-podarcis-muted">
-                                    {successCase.result}
+                                    {successCase.excerpt ?? successCase.result}
                                 </p>
                             </Link>
                         ))}
@@ -159,7 +163,9 @@ export default function ServiceShow({
             <CTASection
                 title="Hablemos de este servicio"
                 description="Revisamos tu punto de partida y te proponemos un camino práctico."
-                primaryHref={contact.index().url}
+                primaryHref={
+                    contact.index({ query: { service: service.slug } }).url
+                }
                 primaryLabel="Contactar"
             />
         </>

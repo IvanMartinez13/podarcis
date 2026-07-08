@@ -2,7 +2,9 @@ import { Head, Link } from '@inertiajs/react';
 
 import { Container } from '@/components/public/container';
 import { CTASection } from '@/components/public/cta-section';
+import { EmptyState } from '@/components/public/empty-state';
 import { PublicHero } from '@/components/public/public-hero';
+import { Section } from '@/components/public/section';
 import { Badge } from '@/components/ui/badge';
 import * as contact from '@/routes/contact';
 import * as successCases from '@/routes/success-cases';
@@ -10,9 +12,13 @@ import type { CmsSuccessCase } from '@/types';
 
 type SuccessCaseShowProps = {
     successCase: CmsSuccessCase;
+    relatedSuccessCases: CmsSuccessCase[];
 };
 
-export default function SuccessCaseShow({ successCase }: SuccessCaseShowProps) {
+export default function SuccessCaseShow({
+    successCase,
+    relatedSuccessCases,
+}: SuccessCaseShowProps) {
     return (
         <>
             <Head title={successCase.title} />
@@ -29,8 +35,25 @@ export default function SuccessCaseShow({ successCase }: SuccessCaseShowProps) {
                         <h1 className="mt-6 text-4xl font-semibold text-balance sm:text-5xl">
                             {successCase.title}
                         </h1>
+                        <div className="mt-5 flex flex-wrap gap-2">
+                            {successCase.clientName && (
+                                <Badge className="bg-white/10 text-white">
+                                    {successCase.clientName}
+                                </Badge>
+                            )}
+                            {successCase.sector && (
+                                <Badge className="bg-podarcis-green text-podarcis-navy">
+                                    {successCase.sector}
+                                </Badge>
+                            )}
+                            {successCase.service && (
+                                <Badge className="bg-white/10 text-white">
+                                    {successCase.service.title}
+                                </Badge>
+                            )}
+                        </div>
                         <p className="mt-6 text-lg leading-8 text-white/75">
-                            {successCase.result}
+                            {successCase.excerpt ?? successCase.result}
                         </p>
                     </div>
                     <img
@@ -59,12 +82,45 @@ export default function SuccessCaseShow({ successCase }: SuccessCaseShowProps) {
                                 {title}
                             </Badge>
                             <p className="mt-5 leading-7 text-podarcis-muted">
-                                {text}
+                                {text ?? 'Pendiente de completar desde el CMS.'}
                             </p>
                         </div>
                     ))}
                 </div>
             </Container>
+
+            <Section
+                eyebrow="Casos relacionados"
+                title="Más proyectos con un contexto técnico similar"
+                className="bg-podarcis-surface"
+            >
+                {relatedSuccessCases.length > 0 ? (
+                    <div className="grid gap-5 lg:grid-cols-3">
+                        {relatedSuccessCases.map((relatedCase) => (
+                            <Link
+                                className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+                                href={relatedCase.href}
+                                key={relatedCase.slug}
+                            >
+                                <Badge className="bg-podarcis-surface text-podarcis-navy">
+                                    {relatedCase.sector ?? 'Caso'}
+                                </Badge>
+                                <h2 className="mt-4 text-xl font-semibold text-podarcis-navy">
+                                    {relatedCase.title}
+                                </h2>
+                                <p className="mt-3 text-sm leading-6 text-podarcis-muted">
+                                    {relatedCase.excerpt ?? relatedCase.result}
+                                </p>
+                            </Link>
+                        ))}
+                    </div>
+                ) : (
+                    <EmptyState
+                        title="Sin casos relacionados publicados"
+                        description="Cuando haya más casos del mismo servicio aparecerán aquí."
+                    />
+                )}
+            </Section>
 
             <CTASection
                 title="¿Quieres un resultado parecido en tu organización?"

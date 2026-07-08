@@ -21,9 +21,12 @@ import { cn } from '@/lib/utils';
 import { home, logout } from '@/routes';
 import * as admin from '@/routes/admin';
 import * as categories from '@/routes/admin/categories';
+import * as leads from '@/routes/admin/leads';
 import * as pages from '@/routes/admin/pages';
 import * as posts from '@/routes/admin/posts';
 import * as services from '@/routes/admin/services';
+import * as successCases from '@/routes/admin/success-cases';
+import * as testimonials from '@/routes/admin/testimonials';
 import type { SharedPageProps } from '@/types';
 
 type AdminNavItem = {
@@ -61,18 +64,18 @@ const navItems: AdminNavItem[] = [
     },
     {
         title: 'Casos',
+        href: successCases.index(),
         icon: Trophy,
-        disabled: true,
     },
     {
         title: 'Testimonios',
+        href: testimonials.index(),
         icon: Quote,
-        disabled: true,
     },
     {
         title: 'Leads',
+        href: leads.index(),
         icon: Inbox,
-        disabled: true,
     },
 ];
 
