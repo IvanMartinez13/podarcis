@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PostController as AdminPostController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\SuccessCaseController as AdminSuccessCaseController;
 use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
@@ -39,6 +40,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('pages', AdminPageController::class)->except('show');
         Route::resource('success-cases', AdminSuccessCaseController::class)->except('show');
         Route::resource('testimonials', AdminTestimonialController::class)->except('show');
+        Route::resource('users', AdminUserController::class)->except('show');
         Route::get('leads', [AdminLeadController::class, 'index'])->name('leads.index');
         Route::get('leads/{lead}', [AdminLeadController::class, 'show'])->name('leads.show');
         Route::patch('leads/{lead}/status', [AdminLeadController::class, 'updateStatus'])->name('leads.status');

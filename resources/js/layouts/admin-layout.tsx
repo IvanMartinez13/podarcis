@@ -11,6 +11,7 @@ import {
     Newspaper,
     Quote,
     Trophy,
+    Users,
 } from 'lucide-react';
 import type { ComponentType, ReactNode } from 'react';
 import { useState } from 'react';
@@ -27,6 +28,7 @@ import * as posts from '@/routes/admin/posts';
 import * as services from '@/routes/admin/services';
 import * as successCases from '@/routes/admin/success-cases';
 import * as testimonials from '@/routes/admin/testimonials';
+import * as users from '@/routes/admin/users';
 import type { SharedPageProps } from '@/types';
 
 type AdminNavItem = {
@@ -71,6 +73,11 @@ const navItems: AdminNavItem[] = [
         title: 'Testimonios',
         href: testimonials.index(),
         icon: Quote,
+    },
+    {
+        title: 'Usuarios',
+        href: users.index(),
+        icon: Users,
     },
     {
         title: 'Leads',

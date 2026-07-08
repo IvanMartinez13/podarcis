@@ -50,7 +50,7 @@ export default function ServiceShow({
                         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                             <Button
                                 asChild
-                                className="bg-podarcis-green text-podarcis-navy"
+                                className="bg-podarcis-green text-podarcis-navy shadow-xl shadow-podarcis-green/25 transition duration-300 hover:-translate-y-0.5 hover:bg-podarcis-green/90 hover:shadow-podarcis-green/40"
                             >
                                 <Link
                                     href={contact.index({

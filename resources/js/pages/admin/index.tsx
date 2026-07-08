@@ -18,6 +18,7 @@ import * as posts from '@/routes/admin/posts';
 import * as services from '@/routes/admin/services';
 import * as successCases from '@/routes/admin/success-cases';
 import * as testimonials from '@/routes/admin/testimonials';
+import * as users from '@/routes/admin/users';
 
 type DashboardProps = {
     stats: {
@@ -245,6 +246,16 @@ export default function AdminIndex({ stats, latestLeads }: DashboardProps) {
                                 <Link href={testimonials.create()}>
                                     <Plus className="size-4" />
                                     Nuevo testimonio
+                                </Link>
+                            </Button>
+                            <Button
+                                asChild
+                                className="justify-start"
+                                variant="outline"
+                            >
+                                <Link href={users.create()}>
+                                    <Plus className="size-4" />
+                                    Nuevo usuario
                                 </Link>
                             </Button>
                         </div>

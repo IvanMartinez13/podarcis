@@ -22,6 +22,7 @@ test('admin routes require authentication', function (string $routeName) {
     'admin.pages.index',
     'admin.success-cases.index',
     'admin.testimonials.index',
+    'admin.users.index',
     'admin.leads.index',
 ]);
 
@@ -218,6 +219,73 @@ test('category with posts cannot be deleted', function () {
         ->assertSessionHas('error');
 
     $this->assertModelExists($category);
+});
+
+test('admin can create users from cms', function () {
+    $admin = User::factory()->create();
+
+    $this->actingAs($admin)
+        ->post(route('admin.users.store'), [
+            'name' => 'Gestor CMS',
+            'email' => 'gestor@podarcis.app',
+            'password' => 'Password123!',
+            'password_confirmation' => 'Password123!',
+        ])
+        ->assertRedirect(route('admin.users.index'))
+        ->assertSessionHas('success');
+
+    $this->assertDatabaseHas('users', [
+        'name' => 'Gestor CMS',
+        'email' => 'gestor@podarcis.app',
+    ]);
+});
+
+test('admin can update users without changing password', function () {
+    $admin = User::factory()->create();
+    $user = User::factory()->create([
+        'email' => 'before@podarcis.app',
+    ]);
+
+    $originalPassword = $user->password;
+
+    $this->actingAs($admin)
+        ->patch(route('admin.users.update', $user), [
+            'name' => 'Nombre actualizado',
+            'email' => 'after@podarcis.app',
+            'password' => '',
+            'password_confirmation' => '',
+        ])
+        ->assertRedirect(route('admin.users.index'))
+        ->assertSessionHas('success');
+
+    $user->refresh();
+
+    expect($user->name)->toBe('Nombre actualizado')
+        ->and($user->email)->toBe('after@podarcis.app')
+        ->and($user->password)->toBe($originalPassword);
+});
+
+test('admin cannot delete own user from cms', function () {
+    $admin = User::factory()->create();
+
+    $this->actingAs($admin)
+        ->delete(route('admin.users.destroy', $admin))
+        ->assertRedirect()
+        ->assertSessionHas('error');
+
+    $this->assertModelExists($admin);
+});
+
+test('admin can delete another user from cms', function () {
+    $admin = User::factory()->create();
+    $user = User::factory()->create();
+
+    $this->actingAs($admin)
+        ->delete(route('admin.users.destroy', $user))
+        ->assertRedirect(route('admin.users.index'))
+        ->assertSessionHas('success');
+
+    $this->assertModelMissing($user);
 });
 
 test('post can be created with generated slug, authenticated author and automatic publication date', function () {
