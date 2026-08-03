@@ -10,6 +10,7 @@ import {
     Menu,
     Newspaper,
     Quote,
+    Settings2,
     Trophy,
     Users,
 } from 'lucide-react';
@@ -26,6 +27,7 @@ import * as leads from '@/routes/admin/leads';
 import * as pages from '@/routes/admin/pages';
 import * as posts from '@/routes/admin/posts';
 import * as services from '@/routes/admin/services';
+import * as siteSettings from '@/routes/admin/site-settings';
 import * as successCases from '@/routes/admin/success-cases';
 import * as testimonials from '@/routes/admin/testimonials';
 import * as users from '@/routes/admin/users';
@@ -83,6 +85,11 @@ const navItems: AdminNavItem[] = [
         title: 'Leads',
         href: leads.index(),
         icon: Inbox,
+    },
+    {
+        title: 'Ajustes del sitio',
+        href: siteSettings.edit(),
+        icon: Settings2,
     },
 ];
 

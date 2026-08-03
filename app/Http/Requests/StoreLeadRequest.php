@@ -35,7 +35,7 @@ class StoreLeadRequest extends FormRequest
             'message' => ['required', 'string', 'min:10', 'max:5000'],
             'privacy_accepted' => ['accepted'],
             'cf_turnstile_response' => ['required', 'string'],
-            'source' => ['nullable', 'string', 'max:255'],
+            'source' => ['nullable', 'string', 'max:255', 'regex:/^(contact_page|digital_solution_demo|team_card:[A-Za-z0-9_-]{1,80})$/'],
             'website' => ['prohibited'],
         ];
     }

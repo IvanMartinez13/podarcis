@@ -28,6 +28,7 @@ class PostFactory extends Factory
             'excerpt' => fake()->sentence(22),
             'content' => fake()->paragraphs(6, true),
             'featured_image' => null,
+            'featured_image_alt' => null,
             'category_id' => Category::factory(),
             'author_id' => User::factory(),
             'seo_title' => $title,

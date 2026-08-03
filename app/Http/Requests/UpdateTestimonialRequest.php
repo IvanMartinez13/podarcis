@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\CmsHtmlSanitizer;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -22,6 +23,7 @@ class UpdateTestimonialRequest extends FormRequest
         $this->merge([
             'is_featured' => $this->boolean('is_featured'),
             'remove_avatar' => $this->boolean('remove_avatar'),
+            'quote' => CmsHtmlSanitizer::cleanNullable($this->input('quote')),
             'sort_order' => $this->input('sort_order') === null ? 0 : $this->input('sort_order'),
         ]);
     }

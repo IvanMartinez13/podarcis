@@ -6,6 +6,7 @@ use App\Http\Requests\StoreLeadRequest;
 use App\Models\Lead;
 use App\Models\Page;
 use App\Models\Service;
+use App\Support\PublicContentData;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,6 +14,8 @@ use Inertia\Response;
 
 class ContactController extends Controller
 {
+    public function __construct(private PublicContentData $data) {}
+
     public function index(Request $request): Response
     {
         $page = Page::query()->published()->where('slug', 'contacto')->first();
@@ -20,16 +23,17 @@ class ContactController extends Controller
         $selectedService = $services->firstWhere('slug', $request->string('service')->toString());
         $source = $request->string('source')->toString();
         $worker = $request->string('worker')->toString();
+        $contactSource = match (true) {
+            $source === 'digital_solution_demo' => 'digital_solution_demo',
+            $source === 'team_card' && $worker !== '' => "team_card:{$worker}",
+            default => null,
+        };
 
         return Inertia::render('contact/index', [
-            'page' => $page ? [
-                'title' => $page->title,
-                'excerpt' => $page->excerpt,
-                'content' => $page->content,
-            ] : null,
+            'page' => $page ? $this->data->page($page) : null,
             'services' => $services,
             'selectedServiceId' => $selectedService?->id,
-            'contactSource' => $source === 'team_card' && $worker !== '' ? "team_card:{$worker}" : null,
+            'contactSource' => $contactSource,
             'turnstileSiteKey' => config('services.turnstile.site_key'),
         ]);
     }

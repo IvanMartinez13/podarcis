@@ -30,7 +30,10 @@ class SuccessCaseFactory extends Factory
             'solution' => fake()->paragraph(),
             'result' => fake()->paragraph(),
             'featured_image' => null,
+            'featured_image_alt' => null,
             'service_id' => Service::factory(),
+            'seo_title' => $title,
+            'seo_description' => fake()->sentence(18),
             'status' => 'draft',
             'published_at' => null,
         ];

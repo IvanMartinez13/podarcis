@@ -1,6 +1,7 @@
-import { Head } from '@inertiajs/react';
-
+import { Container } from '@/components/public/container';
+import { PublicHero } from '@/components/public/public-hero';
 import { Section } from '@/components/public/section';
+import { SeoHead } from '@/components/public/seo-head';
 
 const privacySections = [
     [
@@ -24,7 +25,21 @@ const privacySections = [
 export default function PrivacyPolicy() {
     return (
         <>
-            <Head title="Política de privacidad" />
+            <SeoHead
+                description="Información básica sobre el tratamiento de datos personales en la web de PODARCIS SL."
+                title="Política de privacidad"
+            />
+
+            <PublicHero>
+                <Container className="py-16 sm:py-20">
+                    <p className="text-sm font-semibold tracking-wide text-podarcis-green uppercase">
+                        Legal
+                    </p>
+                    <h1 className="mt-4 text-4xl font-semibold text-white sm:text-5xl">
+                        Política de privacidad
+                    </h1>
+                </Container>
+            </PublicHero>
 
             <Section
                 eyebrow="Legal"
@@ -35,7 +50,7 @@ export default function PrivacyPolicy() {
                 <div className="mx-auto grid max-w-4xl gap-5">
                     {privacySections.map(([title, text]) => (
                         <article
-                            className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+                            className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
                             key={title}
                         >
                             <h2 className="text-lg font-semibold text-podarcis-navy">

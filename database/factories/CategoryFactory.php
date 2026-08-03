@@ -19,6 +19,7 @@ class CategoryFactory extends Factory
     public function definition(): array
     {
         $name = fake()->unique()->words(2, true);
+        $name = is_string($name) ? $name : implode(' ', $name);
 
         return [
             'name' => Str::title($name),

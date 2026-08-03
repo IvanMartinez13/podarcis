@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { useForm, usePage } from '@inertiajs/react';
 import { CheckCircle2, Mail, Phone, ShieldCheck } from 'lucide-react';
 import type { FormEvent } from 'react';
 import type { ReactNode } from 'react';
@@ -7,13 +7,14 @@ import { useState } from 'react';
 import { Container } from '@/components/public/container';
 import { PublicHero } from '@/components/public/public-hero';
 import { Section } from '@/components/public/section';
+import { SeoHead } from '@/components/public/seo-head';
 import { TurnstileWidget } from '@/components/public/turnstile-widget';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import * as contact from '@/routes/contact';
-import type { CmsPage } from '@/types';
+import type { CmsPage, SharedPageProps } from '@/types';
 
 type ContactService = {
     id: number;
@@ -22,7 +23,7 @@ type ContactService = {
 };
 
 type ContactProps = {
-    page: Pick<CmsPage, 'title' | 'excerpt' | 'content'> | null;
+    page: CmsPage | null;
     services: ContactService[];
     selectedServiceId: number | null;
     contactSource: string | null;
@@ -49,9 +50,7 @@ export default function ContactIndex({
     contactSource,
     turnstileSiteKey,
 }: ContactProps) {
-    const { flash } = usePage().props as {
-        flash?: { success?: string | null };
-    };
+    const { flash, site } = usePage<SharedPageProps>().props;
     const form = useForm<ContactForm>({
         name: '',
         email: '',
@@ -82,10 +81,14 @@ export default function ContactIndex({
 
     return (
         <>
-            <Head title={page?.title ?? 'Contacto'} />
+            <SeoHead
+                description={page?.seoDescription ?? page?.excerpt}
+                image={page?.ogImage}
+                title={page?.seoTitle ?? page?.title ?? 'Contacto'}
+            />
 
-            <PublicHero className="py-16 sm:py-20">
-                <Container className="grid gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+            <PublicHero>
+                <Container className="grid gap-10 py-20 sm:py-24 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
                     <div>
                         <p className="text-sm font-semibold text-podarcis-green">
                             Contacto
@@ -97,23 +100,35 @@ export default function ContactIndex({
                             {page?.excerpt ??
                                 'Cuéntanos qué necesitas y el equipo de PODARCIS te ayudará a encontrar la mejor solución técnica, ambiental o de gestión.'}
                         </p>
-                        <div className="mt-8 grid gap-3 text-sm text-white/75">
-                            <span className="inline-flex items-center gap-3">
-                                <Mail
-                                    className="size-4 text-podarcis-green"
-                                    aria-hidden="true"
-                                />
-                                contacto@podarcis.com
-                            </span>
-                            <span className="inline-flex items-center gap-3">
-                                <Phone
-                                    className="size-4 text-podarcis-green"
-                                    aria-hidden="true"
-                                />
-                                Respuesta comercial personalizada
-                            </span>
-                        </div>
-                        <div className="mt-8 rounded-lg border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                        {(site?.contact?.email || site?.contact?.phone) && (
+                            <div className="mt-8 grid gap-3 text-sm text-white/75">
+                                {site.contact?.email && (
+                                    <a
+                                        className="inline-flex items-center gap-3 hover:text-white"
+                                        href={`mailto:${site.contact.email}`}
+                                    >
+                                        <Mail
+                                            className="size-4 text-podarcis-green"
+                                            aria-hidden="true"
+                                        />
+                                        {site.contact.email}
+                                    </a>
+                                )}
+                                {site.contact?.phone && (
+                                    <a
+                                        className="inline-flex items-center gap-3 hover:text-white"
+                                        href={`tel:${site.contact.phone}`}
+                                    >
+                                        <Phone
+                                            className="size-4 text-podarcis-green"
+                                            aria-hidden="true"
+                                        />
+                                        {site.contact.phone}
+                                    </a>
+                                )}
+                            </div>
+                        )}
+                        <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
                             <ShieldCheck
                                 className="size-6 text-podarcis-green"
                                 aria-hidden="true"
@@ -126,7 +141,7 @@ export default function ContactIndex({
                         </div>
                     </div>
                     <form
-                        className="rounded-lg border border-white/10 bg-white p-6 text-slate-950 shadow-2xl shadow-black/20"
+                        className="rounded-3xl border border-white/10 bg-white p-6 text-slate-950 shadow-2xl shadow-black/20"
                         onSubmit={submit}
                     >
                         {flash?.success && (

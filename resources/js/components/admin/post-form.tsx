@@ -4,6 +4,7 @@ import { AdminFormSection } from '@/components/admin/admin-form-section';
 import { FormField } from '@/components/admin/form-field';
 import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { SeoCounter } from '@/components/admin/seo-counter';
+import { SummernoteField } from '@/components/admin/summernote-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import * as posts from '@/routes/admin/posts';
@@ -20,6 +21,7 @@ export type AdminPostFormData = {
     excerpt: string;
     content: string;
     featuredImage: string;
+    featuredImageAlt?: string;
     categoryId: number | string | null;
     seoTitle: string;
     seoDescription: string;
@@ -40,6 +42,7 @@ type PostFormPayload = {
     excerpt: string;
     content: string;
     featured_image: string;
+    featured_image_alt: string;
     featured_image_upload: File | null;
     remove_featured_image: boolean;
     category_id: string;
@@ -56,6 +59,7 @@ export function PostForm({ post, categories, mode }: PostFormProps) {
         excerpt: post.excerpt ?? '',
         content: post.content ?? '',
         featured_image: post.featuredImage ?? '',
+        featured_image_alt: post.featuredImageAlt ?? '',
         featured_image_upload: null,
         remove_featured_image: false,
         category_id: post.categoryId ? String(post.categoryId) : '',
@@ -84,7 +88,7 @@ export function PostForm({ post, categories, mode }: PostFormProps) {
         <form className="grid gap-6" onSubmit={submit}>
             <AdminFormSection
                 title="Contenido del post"
-                description="Texto base del artículo. El editor avanzado llegará en una fase posterior."
+                description="Texto enriquecido del artículo con formato visual editable."
             >
                 <div className="grid gap-5 lg:grid-cols-2">
                     <FormField
@@ -116,35 +120,23 @@ export function PostForm({ post, categories, mode }: PostFormProps) {
                     </FormField>
                 </div>
 
-                <FormField
+                <SummernoteField
                     error={form.errors.excerpt}
-                    htmlFor="excerpt"
+                    id="excerpt"
                     label="Extracto"
-                >
-                    <textarea
-                        id="excerpt"
-                        className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.excerpt}
-                        onChange={(event) =>
-                            form.setData('excerpt', event.target.value)
-                        }
-                    />
-                </FormField>
+                    height={160}
+                    value={form.data.excerpt}
+                    onChange={(nextValue) => form.setData('excerpt', nextValue)}
+                />
 
-                <FormField
+                <SummernoteField
                     error={form.errors.content}
-                    htmlFor="content"
+                    id="content"
                     label="Contenido"
-                >
-                    <textarea
-                        id="content"
-                        className="min-h-80 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.content}
-                        onChange={(event) =>
-                            form.setData('content', event.target.value)
-                        }
-                    />
-                </FormField>
+                    height={380}
+                    value={form.data.content}
+                    onChange={(nextValue) => form.setData('content', nextValue)}
+                />
             </AdminFormSection>
 
             <AdminFormSection
@@ -232,6 +224,22 @@ export function PostForm({ post, categories, mode }: PostFormProps) {
                     }
                 />
                 <FormField
+                    error={form.errors.featured_image_alt}
+                    htmlFor="featured_image_alt"
+                    label="Texto alternativo"
+                >
+                    <Input
+                        id="featured_image_alt"
+                        value={form.data.featured_image_alt}
+                        onChange={(event) =>
+                            form.setData(
+                                'featured_image_alt',
+                                event.target.value,
+                            )
+                        }
+                    />
+                </FormField>
+                <FormField
                     error={form.errors.seo_title}
                     htmlFor="seo_title"
                     label="SEO title"
@@ -245,21 +253,17 @@ export function PostForm({ post, categories, mode }: PostFormProps) {
                     />
                     <SeoCounter value={form.data.seo_title} max={60} />
                 </FormField>
-                <FormField
+                <SummernoteField
                     error={form.errors.seo_description}
-                    htmlFor="seo_description"
+                    id="seo_description"
                     label="SEO description"
-                >
-                    <textarea
-                        id="seo_description"
-                        className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.seo_description}
-                        onChange={(event) =>
-                            form.setData('seo_description', event.target.value)
-                        }
-                    />
-                    <SeoCounter value={form.data.seo_description} max={160} />
-                </FormField>
+                    height={170}
+                    value={form.data.seo_description}
+                    onChange={(nextValue) =>
+                        form.setData('seo_description', nextValue)
+                    }
+                />
+                <SeoCounter value={form.data.seo_description} max={160} />
             </AdminFormSection>
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

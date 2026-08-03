@@ -54,7 +54,7 @@ test('legal pages render as public inertia pages', function (string $routeName, 
 test('services index and show expose only published services', function () {
     $published = Service::factory()->published()->ordered(10)->create([
         'title' => 'Servicio publicado',
-        'featured_image' => 'https://placehold.co/1200x760/163247/FFFFFF?text=Servicio',
+        'featured_image' => 'cms/services/service-hero.webp',
     ]);
     $draft = Service::factory()->create(['title' => 'Servicio borrador']);
 
@@ -65,9 +65,13 @@ test('services index and show expose only published services', function () {
             ->has('services', 1)
             ->where('services.0.title', 'Servicio publicado')
             ->where('services.0.slug', $published->slug)
-            ->where('services.0.featuredImage', 'https://placehold.co/1200x760/163247/FFFFFF?text=Servicio'));
+            ->where('services.0.featuredImage', fn (string $url): bool => str_ends_with($url, '/storage/cms/services/service-hero.webp')));
 
-    $this->get(route('services.show', $published))->assertOk();
+    $this->get(route('services.show', $published))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('services/show')
+            ->where('service.featuredImage', fn (string $url): bool => str_ends_with($url, '/storage/cms/services/service-hero.webp')));
     $this->get(route('services.show', $draft))->assertNotFound();
 });
 
@@ -123,6 +127,7 @@ test('about page loads the published quienes somos page', function () {
                     'handle' => 'javicodes',
                     'status' => 'Online',
                     'contactText' => 'Contactar',
+                    'linkedinUrl' => 'https://www.linkedin.com/in/javicodes',
                     'avatarUrl' => 'https://placehold.co/720x1000/163247/FFFFFF?text=Javi',
                     'enableTilt' => true,
                     'innerGradient' => 'linear-gradient(145deg, #244D3A8C 0%, #6FAF4544 100%)',
@@ -136,8 +141,11 @@ test('about page loads the published quienes somos page', function () {
         ->assertInertia(fn (Assert $page) => $page
             ->component('pages/about')
             ->where('page.title', 'Quiénes somos')
-            ->where('page.blocks.teamCoverImage', 'https://placehold.co/1440x760/163247/FFFFFF?text=Equipo')
+            ->where('page.blocks.teamCoverImage', null)
             ->where('page.blocks.teamMembers.0.name', 'Javi A. Torres')
+            ->where('page.blocks.teamMembers.0.linkedinUrl', 'https://www.linkedin.com/in/javicodes')
+            ->where('page.blocks.teamMembers.0.avatarUrl', null)
+            ->missing('page.blocks.teamMembers.0.contactText')
             ->missing('page.blocks.teamMembers.0.enableTilt')
             ->missing('page.blocks.teamMembers.0.innerGradient'));
 });

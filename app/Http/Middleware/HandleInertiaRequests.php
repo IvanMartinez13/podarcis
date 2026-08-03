@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -45,7 +46,34 @@ class HandleInertiaRequests extends Middleware
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
             ],
+            'site' => fn (): array => $this->siteData(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function siteData(): array
+    {
+        $settings = SiteSetting::query()
+            ->where('singleton_key', 'site')
+            ->first([
+                'brand_description',
+                'navigation',
+                'header_cta',
+                'contact',
+                'social_links',
+                'footer_groups',
+            ]);
+
+        return [
+            'navigation' => $settings->navigation ?? [],
+            'headerCta' => $settings?->header_cta,
+            'brandDescription' => $settings?->brand_description,
+            'contact' => $settings?->contact,
+            'socialLinks' => $settings->social_links ?? [],
+            'footerGroups' => $settings->footer_groups ?? [],
         ];
     }
 }

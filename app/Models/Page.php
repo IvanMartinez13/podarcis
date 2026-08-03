@@ -15,7 +15,7 @@ use Illuminate\Support\Carbon;
  * @property string $slug
  * @property string|null $excerpt
  * @property string|null $content
- * @property array<int, mixed>|null $blocks
+ * @property array<string, mixed>|null $blocks
  * @property string|null $seo_title
  * @property string|null $seo_description
  * @property string|null $og_image

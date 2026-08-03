@@ -32,7 +32,7 @@ class CmsImageStorage
 
     public function url(?string $path): ?string
     {
-        if ($path === null || trim($path) === '') {
+        if ($path === null || trim($path) === '' || Str::contains(Str::lower($path), 'placehold.co')) {
             return null;
         }
 
@@ -78,7 +78,7 @@ class CmsImageStorage
             imagedestroy($image);
         }
 
-        if ($encoded !== true || ! is_string($output)) {
+        if ($encoded !== true) {
             throw new RuntimeException('No se pudo optimizar la imagen subida.');
         }
 

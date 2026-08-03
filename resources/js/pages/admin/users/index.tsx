@@ -48,12 +48,7 @@ export default function UsersIndex({ users: items }: UsersIndexProps) {
                 />
 
                 <AdminTable
-                    columns={[
-                        'Usuario',
-                        'Verificación',
-                        'Alta',
-                        'Acciones',
-                    ]}
+                    columns={['Usuario', 'Verificación', 'Alta', 'Acciones']}
                     empty="Todavía no hay usuarios creados."
                     isEmpty={items.length === 0}
                 >
@@ -78,9 +73,7 @@ export default function UsersIndex({ users: items }: UsersIndexProps) {
                                         Verificado
                                     </Badge>
                                 ) : (
-                                    <Badge variant="outline">
-                                        Pendiente
-                                    </Badge>
+                                    <Badge variant="outline">Pendiente</Badge>
                                 )}
                             </td>
                             <td className="px-5 py-4">
@@ -89,7 +82,9 @@ export default function UsersIndex({ users: items }: UsersIndexProps) {
                             <td className="px-5 py-4">
                                 <div className="flex gap-2">
                                     <Button asChild size="sm" variant="outline">
-                                        <Link href={users.edit({ user: user.id })}>
+                                        <Link
+                                            href={users.edit({ user: user.id })}
+                                        >
                                             <Edit3 className="size-4" />
                                             Editar
                                         </Link>

@@ -2,20 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Page;
 use App\Models\Service;
 use App\Models\SuccessCase;
-use App\Support\CmsImageStorage;
+use App\Support\PublicContentData;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class ServiceController extends Controller
 {
-    public function __construct(private CmsImageStorage $images) {}
+    public function __construct(private PublicContentData $data) {}
 
     public function index(): Response
     {
         return Inertia::render('services/index', [
-            'services' => Service::query()->published()->ordered()->get()->map(fn (Service $service): array => $this->summary($service)),
+            'page' => ($page = Page::query()->published()->where('slug', 'servicios')->first())
+                ? $this->data->page($page)
+                : null,
+            'services' => Service::query()
+                ->published()
+                ->where('kind', 'consulting')
+                ->ordered()
+                ->get()
+                ->map(fn (Service $service): array => $this->data->service($service)),
         ]);
     }
 
@@ -23,42 +32,18 @@ class ServiceController extends Controller
     {
         abort_unless($this->isPublished($service), 404);
 
-        $service->load(['successCases' => fn ($query) => $query->published()->latest('published_at')->limit(3)]);
+        $service->load(['successCases' => fn ($query) => $query->published()->with('service')->latest('published_at')->limit(3)]);
 
         return Inertia::render('services/show', [
             'service' => [
-                ...$this->summary($service),
+                ...$this->data->service($service),
                 'description' => $service->description,
+                'blocks' => $service->blocks,
                 'seoTitle' => $service->seo_title,
                 'seoDescription' => $service->seo_description,
             ],
-            'successCases' => $service->successCases->map(fn (SuccessCase $successCase): array => [
-                'title' => $successCase->title,
-                'slug' => $successCase->slug,
-                'clientName' => $successCase->client_name,
-                'sector' => $successCase->sector,
-                'excerpt' => $successCase->challenge ?: $successCase->solution,
-                'result' => $successCase->result,
-                'featuredImage' => $this->images->url($successCase->featured_image),
-                'href' => route('success-cases.show', $successCase),
-            ]),
+            'successCases' => $service->successCases->map(fn (SuccessCase $successCase): array => $this->data->successCase($successCase)),
         ]);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function summary(Service $service): array
-    {
-        return [
-            'id' => $service->id,
-            'title' => $service->title,
-            'slug' => $service->slug,
-            'excerpt' => $service->excerpt,
-            'icon' => $service->icon,
-            'featuredImage' => $this->images->url($service->featured_image),
-            'href' => route('services.show', $service),
-        ];
     }
 
     private function isPublished(Service $service): bool

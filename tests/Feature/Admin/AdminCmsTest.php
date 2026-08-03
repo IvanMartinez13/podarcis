@@ -37,6 +37,18 @@ test('authenticated user can load admin dashboard', function () {
             ->has('stats'));
 });
 
+test('service edit exposes its current classification', function () {
+    $user = User::factory()->create();
+    $service = Service::factory()->create(['kind' => 'digital']);
+
+    $this->actingAs($user)
+        ->get(route('admin.services.edit', $service))
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('admin/services/edit')
+            ->where('service.kind', 'digital'));
+});
+
 test('service can be created with generated slug', function () {
     $user = User::factory()->create();
 
@@ -479,6 +491,7 @@ test('about page can be updated with configurable team blocks', function () {
                         'handle' => 'javicodes',
                         'status' => 'Online',
                         'contactText' => 'Contactar',
+                        'linkedinUrl' => 'https://www.linkedin.com/in/javicodes',
                         'avatarUrl' => 'https://placehold.co/720x1000/163247/FFFFFF?text=Javi',
                     ],
                 ],
@@ -496,9 +509,52 @@ test('about page can be updated with configurable team blocks', function () {
 
     expect($page->blocks['teamCoverImage'])->toBe('https://placehold.co/1440x760/163247/FFFFFF?text=Equipo')
         ->and($page->blocks['teamMembers'][0]['name'])->toBe('Javi A. Torres')
+        ->and($page->blocks['teamMembers'][0]['linkedinUrl'])->toBe('https://www.linkedin.com/in/javicodes')
+        ->and($page->blocks['teamMembers'][0])->not->toHaveKey('contactText')
         ->and($page->blocks['teamMembers'][0])->not->toHaveKey('enableTilt')
         ->and($page->blocks['teamMembers'][0])->not->toHaveKey('innerGradient');
+
+    $this->actingAs($user)
+        ->get(route('admin.pages.edit', $page))
+        ->assertOk()
+        ->assertInertia(fn (Assert $inertia) => $inertia
+            ->component('admin/pages/edit')
+            ->where('page.blocks.teamMembers.0.linkedinUrl', 'https://www.linkedin.com/in/javicodes')
+            ->missing('page.blocks.teamMembers.0.contactText'));
 });
+
+test('about team member linkedin URL must use the LinkedIn domain', function (string $linkedinUrl) {
+    $user = User::factory()->create();
+    $page = Page::factory()->published()->create([
+        'title' => 'Quiénes somos',
+        'slug' => 'quienes-somos',
+    ]);
+
+    $this->actingAs($user)
+        ->patch(route('admin.pages.update', $page), [
+            'title' => 'Quiénes somos',
+            'slug' => 'quienes-somos',
+            'excerpt' => 'Equipo técnico.',
+            'content' => 'Contenido corporativo.',
+            'blocks' => [
+                'teamMembers' => [[
+                    'name' => 'Javi A. Torres',
+                    'linkedinUrl' => $linkedinUrl,
+                ]],
+            ],
+            'seo_title' => '',
+            'seo_description' => '',
+            'og_image' => '',
+            'status' => 'published',
+            'published_at' => now()->format('Y-m-d H:i:s'),
+        ])
+        ->assertSessionHasErrors(['blocks.teamMembers.0.linkedinUrl']);
+})->with([
+    'malformed URL' => 'linkedin-profile',
+    'unsupported protocol' => 'ftp://www.linkedin.com/in/javicodes',
+    'unrelated domain' => 'https://example.com/in/javicodes',
+    'deceptive subdomain' => 'https://linkedin.com.example.com/in/javicodes',
+]);
 
 test('about page ignores legacy team card presentation fields', function () {
     $user = User::factory()->create();
@@ -522,6 +578,7 @@ test('about page ignores legacy team card presentation fields', function () {
                         'handle' => 'javicodes',
                         'status' => 'Online',
                         'contactText' => 'Contactar',
+                        'linkedinUrl' => 'https://es.linkedin.com/in/javicodes',
                         'avatarUrl' => 'https://placehold.co/720x1000/163247/FFFFFF?text=Javi',
                         'enableTilt' => true,
                         'innerGradient' => 'linear-gradient(145deg, #244D3A8C 0%, #6FAF4544 100%)',
@@ -566,7 +623,7 @@ test('about page stores team cover as webp and png avatars in blocks', function 
                         'title' => 'Software Engineer',
                         'handle' => 'javicodes',
                         'status' => 'Online',
-                        'contactText' => 'Contactar',
+                        'linkedinUrl' => '',
                         'avatarUrl' => '',
                     ],
                 ],

@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $excerpt
  * @property string $content
  * @property string|null $featured_image
+ * @property string|null $featured_image_alt
  * @property int|null $category_id
  * @property int|null $author_id
  * @property string|null $seo_title
@@ -26,7 +27,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['title', 'slug', 'excerpt', 'content', 'featured_image', 'category_id', 'author_id', 'seo_title', 'seo_description', 'status', 'published_at'])]
+#[Fillable(['title', 'slug', 'excerpt', 'content', 'featured_image', 'featured_image_alt', 'category_id', 'author_id', 'seo_title', 'seo_description', 'status', 'published_at'])]
 class Post extends Model
 {
     /** @use HasFactory<PostFactory> */

@@ -14,10 +14,14 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $title
  * @property string $slug
+ * @property string $kind
  * @property string|null $excerpt
  * @property string|null $description
  * @property string|null $icon
  * @property string|null $featured_image
+ * @property string|null $featured_image_alt
+ * @property string|null $logo_image
+ * @property string|null $logo_image_alt
  * @property array<int, mixed>|null $blocks
  * @property string|null $seo_title
  * @property string|null $seo_description
@@ -28,11 +32,15 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['title', 'slug', 'excerpt', 'description', 'icon', 'featured_image', 'blocks', 'seo_title', 'seo_description', 'is_featured', 'sort_order', 'status', 'published_at'])]
+#[Fillable(['title', 'slug', 'kind', 'excerpt', 'description', 'icon', 'featured_image', 'featured_image_alt', 'logo_image', 'logo_image_alt', 'blocks', 'seo_title', 'seo_description', 'is_featured', 'sort_order', 'status', 'published_at'])]
 class Service extends Model
 {
     /** @use HasFactory<ServiceFactory> */
     use HasFactory;
+
+    protected $attributes = [
+        'kind' => 'consulting',
+    ];
 
     /**
      * @return HasMany<SuccessCase, $this>

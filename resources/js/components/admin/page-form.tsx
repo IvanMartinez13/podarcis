@@ -3,26 +3,27 @@ import type { FormEvent } from 'react';
 import type { ReactNode } from 'react';
 import { AdminFormSection } from '@/components/admin/admin-form-section';
 import { FormField } from '@/components/admin/form-field';
+import { HomeBlocksEditor } from '@/components/admin/home-blocks-editor';
 import { ImageUploadField } from '@/components/admin/image-upload-field';
 import { SeoCounter } from '@/components/admin/seo-counter';
+import { SummernoteField } from '@/components/admin/summernote-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import * as pages from '@/routes/admin/pages';
-import type { PageBlocks, TeamMember } from '@/types';
-
-const TEAM_COVER_PLACEHOLDER =
-    'https://placehold.co/1440x760/163247/FFFFFF?text=Equipo+PODARCIS';
-
-const TEAM_AVATAR_PLACEHOLDER =
-    'https://placehold.co/720x1000/163247/FFFFFF?text=PODARCIS';
+import type {
+    AboutPageBlocks,
+    HomePageBlocks,
+    PageBlocks,
+    TeamMember,
+} from '@/types';
 
 const DEFAULT_TEAM_MEMBER: TeamMember = {
     name: '',
     title: '',
     handle: '',
     status: 'Disponible',
-    contactText: 'Contactar',
-    avatarUrl: TEAM_AVATAR_PLACEHOLDER,
+    linkedinUrl: '',
+    avatarUrl: '',
 };
 
 export type AdminPageFormData = {
@@ -52,6 +53,14 @@ type AdminPageFormPayload = {
     remove_team_cover_image: boolean;
     team_member_avatar_uploads: (File | null)[];
     remove_team_member_avatars: boolean[];
+    hero_image_upload: File | null;
+    remove_hero_image: boolean;
+    digital_image_upload: File | null;
+    remove_digital_image: boolean;
+    success_cases_background_image_upload: File | null;
+    remove_success_cases_background_image: boolean;
+    testimonials_background_image_upload: File | null;
+    remove_testimonials_background_image: boolean;
     seo_title: string;
     seo_description: string;
     og_image: string;
@@ -65,6 +74,7 @@ type PageFormProps = {
 };
 
 export function PageForm({ page, mode }: PageFormProps) {
+    const initialAboutBlocks = (page.blocks ?? {}) as AboutPageBlocks;
     const form = useForm<AdminPageFormPayload>({
         title: page.title,
         slug: page.slug,
@@ -76,9 +86,17 @@ export function PageForm({ page, mode }: PageFormProps) {
         team_cover_image_upload: null,
         remove_team_cover_image: false,
         team_member_avatar_uploads:
-            page.blocks?.teamMembers?.map(() => null) ?? [],
+            initialAboutBlocks.teamMembers?.map(() => null) ?? [],
         remove_team_member_avatars:
-            page.blocks?.teamMembers?.map(() => false) ?? [],
+            initialAboutBlocks.teamMembers?.map(() => false) ?? [],
+        hero_image_upload: null,
+        remove_hero_image: false,
+        digital_image_upload: null,
+        remove_digital_image: false,
+        success_cases_background_image_upload: null,
+        remove_success_cases_background_image: false,
+        testimonials_background_image_upload: null,
+        remove_testimonials_background_image: false,
         seo_title: page.seoTitle ?? '',
         seo_description: page.seoDescription ?? '',
         og_image: page.ogImage ?? '',
@@ -86,10 +104,15 @@ export function PageForm({ page, mode }: PageFormProps) {
         published_at: page.publishedAt ?? '',
     });
     const isAboutPage = form.data.slug === 'quienes-somos';
-    const blocks = form.data.blocks ?? { teamCoverImage: '', teamMembers: [] };
+    const isHomePage = form.data.slug === 'inicio';
+    const blocks = (form.data.blocks ?? {
+        teamCoverImage: '',
+        teamMembers: [],
+    }) as AboutPageBlocks;
+    const homeBlocks = (form.data.blocks ?? {}) as HomePageBlocks;
     const teamMembers = blocks.teamMembers ?? [];
 
-    function updateBlocks(nextBlocks: PageBlocks) {
+    function updateBlocks(nextBlocks: AboutPageBlocks) {
         form.setData('blocks', {
             teamCoverImage: nextBlocks.teamCoverImage ?? '',
             teamMembers: nextBlocks.teamMembers ?? [],
@@ -175,8 +198,15 @@ export function PageForm({ page, mode }: PageFormProps) {
 
     function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+        const submittedBlocks = isHomePage
+            ? normalizeHomeBlocks(homeBlocks)
+            : form.data.blocks;
 
         if (mode === 'create') {
+            form.transform((data) => ({
+                ...data,
+                blocks: submittedBlocks,
+            }));
             form.post(pages.store().url, { forceFormData: true });
 
             return;
@@ -186,7 +216,11 @@ export function PageForm({ page, mode }: PageFormProps) {
             return;
         }
 
-        form.transform((data) => ({ ...data, _method: 'patch' }));
+        form.transform((data) => ({
+            ...data,
+            blocks: submittedBlocks,
+            _method: 'patch',
+        }));
         form.post(pages.update({ page: page.id }).url, {
             forceFormData: true,
         });
@@ -228,36 +262,96 @@ export function PageForm({ page, mode }: PageFormProps) {
                     </FormField>
                 </div>
 
-                <FormField
+                <SummernoteField
                     error={form.errors.excerpt}
-                    htmlFor="excerpt"
+                    id="excerpt"
                     label="Extracto"
-                >
-                    <textarea
-                        id="excerpt"
-                        className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.excerpt}
-                        onChange={(event) =>
-                            form.setData('excerpt', event.target.value)
-                        }
-                    />
-                </FormField>
+                    height={170}
+                    value={form.data.excerpt}
+                    onChange={(nextValue) => form.setData('excerpt', nextValue)}
+                />
 
-                <FormField
+                <SummernoteField
                     error={form.errors.content}
-                    htmlFor="content"
+                    id="content"
                     label="Contenido"
-                >
-                    <textarea
-                        id="content"
-                        className="min-h-80 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.content}
-                        onChange={(event) =>
-                            form.setData('content', event.target.value)
-                        }
-                    />
-                </FormField>
+                    height={380}
+                    value={form.data.content}
+                    onChange={(nextValue) => form.setData('content', nextValue)}
+                />
             </AdminFormSection>
+
+            {isHomePage && (
+                <AdminFormSection
+                    title="Bloques de la portada"
+                    description="Configuración estructurada del hero, métricas, metodología, secciones editoriales y CTA final. Las colecciones de servicios, casos, testimonios y noticias se alimentan desde sus propios apartados."
+                >
+                    <HomeBlocksEditor
+                        blocks={homeBlocks}
+                        errors={
+                            form.errors as Record<string, string | undefined>
+                        }
+                        progress={form.progress?.percentage ?? null}
+                        removals={{
+                            hero: form.data.remove_hero_image,
+                            digital: form.data.remove_digital_image,
+                            successCases:
+                                form.data.remove_success_cases_background_image,
+                            testimonials:
+                                form.data.remove_testimonials_background_image,
+                        }}
+                        onChange={(nextBlocks) =>
+                            form.setData('blocks', nextBlocks)
+                        }
+                        onUploadChange={(field, file) => {
+                            if (field === 'hero') {
+                                form.setData('hero_image_upload', file);
+                            }
+
+                            if (field === 'digital') {
+                                form.setData('digital_image_upload', file);
+                            }
+
+                            if (field === 'successCases') {
+                                form.setData(
+                                    'success_cases_background_image_upload',
+                                    file,
+                                );
+                            }
+
+                            if (field === 'testimonials') {
+                                form.setData(
+                                    'testimonials_background_image_upload',
+                                    file,
+                                );
+                            }
+                        }}
+                        onRemovalChange={(field, remove) => {
+                            if (field === 'hero') {
+                                form.setData('remove_hero_image', remove);
+                            }
+
+                            if (field === 'digital') {
+                                form.setData('remove_digital_image', remove);
+                            }
+
+                            if (field === 'successCases') {
+                                form.setData(
+                                    'remove_success_cases_background_image',
+                                    remove,
+                                );
+                            }
+
+                            if (field === 'testimonials') {
+                                form.setData(
+                                    'remove_testimonials_background_image',
+                                    remove,
+                                );
+                            }
+                        }}
+                    />
+                </AdminFormSection>
+            )}
 
             {isAboutPage && (
                 <AdminFormSection
@@ -279,7 +373,7 @@ export function PageForm({ page, mode }: PageFormProps) {
                             form.setData('team_cover_image_upload', file);
 
                             if (file) {
-                                updateTeamCoverImage(TEAM_COVER_PLACEHOLDER);
+                                updateTeamCoverImage('');
                             }
                         }}
                         onRemoveChange={(remove) =>
@@ -407,16 +501,18 @@ export function PageForm({ page, mode }: PageFormProps) {
                                     </TeamField>
                                     <TeamField
                                         error={teamError(
-                                            `blocks.teamMembers.${index}.contactText`,
+                                            `blocks.teamMembers.${index}.linkedinUrl`,
                                         )}
-                                        label="Texto botón contacto"
+                                        label="URL de LinkedIn"
                                     >
                                         <Input
-                                            value={member.contactText ?? ''}
+                                            placeholder="https://www.linkedin.com/in/usuario"
+                                            type="url"
+                                            value={member.linkedinUrl ?? ''}
                                             onChange={(event) =>
                                                 updateTeamMember(
                                                     index,
-                                                    'contactText',
+                                                    'linkedinUrl',
                                                     event.target.value,
                                                 )
                                             }
@@ -541,21 +637,17 @@ export function PageForm({ page, mode }: PageFormProps) {
                     />
                     <SeoCounter value={form.data.seo_title} max={60} />
                 </FormField>
-                <FormField
+                <SummernoteField
                     error={form.errors.seo_description}
-                    htmlFor="seo_description"
+                    id="seo_description"
                     label="SEO description"
-                >
-                    <textarea
-                        id="seo_description"
-                        className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.seo_description}
-                        onChange={(event) =>
-                            form.setData('seo_description', event.target.value)
-                        }
-                    />
-                    <SeoCounter value={form.data.seo_description} max={160} />
-                </FormField>
+                    height={170}
+                    value={form.data.seo_description}
+                    onChange={(nextValue) =>
+                        form.setData('seo_description', nextValue)
+                    }
+                />
+                <SeoCounter value={form.data.seo_description} max={160} />
             </AdminFormSection>
 
             <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
@@ -595,4 +687,21 @@ function TeamField({ children, error, label }: TeamFieldProps) {
             {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
         </div>
     );
+}
+
+function normalizeHomeBlocks(blocks: HomePageBlocks): HomePageBlocks {
+    if (!blocks.digital) {
+        return blocks;
+    }
+
+    const { benefits, cta, ...digital } = blocks.digital;
+
+    return {
+        ...blocks,
+        digital: {
+            ...digital,
+            features: digital.features ?? benefits ?? [],
+            primaryCta: digital.primaryCta ?? cta ?? null,
+        },
+    };
 }

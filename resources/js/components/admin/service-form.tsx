@@ -1,12 +1,17 @@
 import { Link, useForm } from '@inertiajs/react';
+import { CircleHelp } from 'lucide-react';
+import { createElement } from 'react';
 import type { FormEvent } from 'react';
 import { AdminFormSection } from '@/components/admin/admin-form-section';
 import { FormField } from '@/components/admin/form-field';
 import { ImageUploadField } from '@/components/admin/image-upload-field';
+import { SummernoteField } from '@/components/admin/summernote-field';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { getServiceIcon, resolveServiceIconName } from '@/lib/cms-icons';
 import * as services from '@/routes/admin/services';
+import type { ServiceBlocks } from '@/types';
 
 export type AdminServiceFormData = {
     id: number | null;
@@ -16,6 +21,11 @@ export type AdminServiceFormData = {
     description: string;
     icon: string;
     featuredImage: string;
+    featuredImageAlt?: string;
+    logoImage?: string;
+    logoImageAlt?: string;
+    kind?: 'consulting' | 'digital';
+    blocks?: ServiceBlocks | null;
     seoTitle: string;
     seoDescription: string;
     isFeatured: boolean;
@@ -36,8 +46,15 @@ type ServiceFormPayload = {
     description: string;
     icon: string;
     featured_image: string;
+    featured_image_alt: string;
     featured_image_upload: File | null;
     remove_featured_image: boolean;
+    logo_image: string;
+    logo_image_alt: string;
+    logo_image_upload: File | null;
+    remove_logo_image: boolean;
+    kind: 'consulting' | 'digital';
+    blocks: ServiceBlocks | null;
     seo_title: string;
     seo_description: string;
     is_featured: boolean;
@@ -45,6 +62,9 @@ type ServiceFormPayload = {
     status: 'draft' | 'published';
     published_at: string;
 };
+
+const invalidIconMessage =
+    'Este icono no existe en la versión de Lucide instalada.';
 
 export function ServiceForm({ service, mode }: ServiceFormProps) {
     const form = useForm<ServiceFormPayload>({
@@ -54,8 +74,15 @@ export function ServiceForm({ service, mode }: ServiceFormProps) {
         description: service.description ?? '',
         icon: service.icon ?? '',
         featured_image: service.featuredImage ?? '',
+        featured_image_alt: service.featuredImageAlt ?? '',
         featured_image_upload: null,
         remove_featured_image: false,
+        logo_image: service.logoImage ?? '',
+        logo_image_alt: service.logoImageAlt ?? '',
+        logo_image_upload: null,
+        remove_logo_image: false,
+        kind: service.kind ?? 'consulting',
+        blocks: service.blocks ?? null,
         seo_title: service.seoTitle ?? '',
         seo_description: service.seoDescription ?? '',
         is_featured: service.isFeatured,
@@ -63,9 +90,28 @@ export function ServiceForm({ service, mode }: ServiceFormProps) {
         status: service.status,
         published_at: service.publishedAt ?? '',
     });
+    const nestedError = (path: string) =>
+        (form.errors as Record<string, string | undefined>)[path];
+    const hasIconValue = form.data.icon.trim().length > 0;
+    const resolvedIconName = resolveServiceIconName(form.data.icon);
+    const hasInvalidIcon = hasIconValue && resolvedIconName === null;
+    const iconError =
+        form.errors.icon ?? (hasInvalidIcon ? invalidIconMessage : undefined);
 
     function submit(event: FormEvent<HTMLFormElement>) {
         event.preventDefault();
+
+        if (hasInvalidIcon) {
+            form.setError('icon', invalidIconMessage);
+
+            return;
+        }
+
+        form.transform((data) => ({
+            ...data,
+            icon: resolvedIconName ?? '',
+            ...(mode === 'edit' ? { _method: 'patch' } : {}),
+        }));
 
         if (mode === 'create') {
             form.post(services.store().url, { forceFormData: true });
@@ -73,7 +119,6 @@ export function ServiceForm({ service, mode }: ServiceFormProps) {
             return;
         }
 
-        form.transform((data) => ({ ...data, _method: 'patch' }));
         form.post(services.update({ service: service.slug }).url, {
             forceFormData: true,
         });
@@ -116,34 +161,101 @@ export function ServiceForm({ service, mode }: ServiceFormProps) {
                 </div>
 
                 <FormField
-                    error={form.errors.excerpt}
-                    htmlFor="excerpt"
-                    label="Extracto"
+                    error={form.errors.kind}
+                    htmlFor="kind"
+                    label="Clasificación"
                 >
-                    <textarea
-                        id="excerpt"
-                        className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.excerpt}
+                    <select
+                        className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+                        id="kind"
+                        value={form.data.kind}
                         onChange={(event) =>
-                            form.setData('excerpt', event.target.value)
+                            form.setData(
+                                'kind',
+                                event.target.value as 'consulting' | 'digital',
+                            )
                         }
-                    />
+                    >
+                        <option value="consulting">Consultoría</option>
+                        <option value="digital">Solución digital</option>
+                    </select>
                 </FormField>
 
-                <FormField
+                <SummernoteField
+                    error={form.errors.excerpt}
+                    id="excerpt"
+                    label="Extracto"
+                    height={170}
+                    value={form.data.excerpt}
+                    onChange={(nextValue) => form.setData('excerpt', nextValue)}
+                />
+
+                <SummernoteField
                     error={form.errors.description}
-                    htmlFor="description"
+                    id="description"
                     label="Descripción"
-                >
-                    <textarea
-                        id="description"
-                        className="min-h-44 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.description}
-                        onChange={(event) =>
-                            form.setData('description', event.target.value)
-                        }
-                    />
-                </FormField>
+                    height={260}
+                    value={form.data.description}
+                    onChange={(nextValue) =>
+                        form.setData('description', nextValue)
+                    }
+                />
+            </AdminFormSection>
+
+            <AdminFormSection
+                title="Detalle del servicio"
+                description="Contenido propio de la ficha y llamada a la acción opcional."
+            >
+                <SummernoteField
+                    error={nestedError('blocks.detail')}
+                    id="blocks_detail"
+                    label="Contenido de detalle"
+                    height={230}
+                    value={form.data.blocks?.detail ?? ''}
+                    onChange={(nextValue) =>
+                        form.setData('blocks', {
+                            ...form.data.blocks,
+                            detail: nextValue,
+                        })
+                    }
+                />
+                <div className="grid gap-5 lg:grid-cols-2">
+                    <FormField
+                        error={nestedError('blocks.cta.label')}
+                        label="Texto del CTA"
+                    >
+                        <Input
+                            value={form.data.blocks?.cta?.label ?? ''}
+                            onChange={(event) =>
+                                form.setData('blocks', {
+                                    ...form.data.blocks,
+                                    cta: {
+                                        label: event.target.value,
+                                        href: form.data.blocks?.cta?.href ?? '',
+                                    },
+                                })
+                            }
+                        />
+                    </FormField>
+                    <FormField
+                        error={nestedError('blocks.cta.href')}
+                        label="URL del CTA"
+                    >
+                        <Input
+                            value={form.data.blocks?.cta?.href ?? ''}
+                            onChange={(event) =>
+                                form.setData('blocks', {
+                                    ...form.data.blocks,
+                                    cta: {
+                                        label:
+                                            form.data.blocks?.cta?.label ?? '',
+                                        href: event.target.value,
+                                    },
+                                })
+                            }
+                        />
+                    </FormField>
+                </div>
             </AdminFormSection>
 
             <AdminFormSection
@@ -218,25 +330,58 @@ export function ServiceForm({ service, mode }: ServiceFormProps) {
 
             <AdminFormSection
                 title="Detalles visuales y SEO"
-                description="Usaremos placeholders mientras el CMS no gestione archivos."
+                description="Configura el icono, el logo opcional y la imagen de cabecera sin mostrar placeholders públicos."
             >
                 <div className="grid gap-5 lg:grid-cols-2">
                     <FormField
-                        error={form.errors.icon}
+                        error={iconError}
+                        hint={
+                            resolvedIconName
+                                ? `Se guardará como “${resolvedIconName}”.`
+                                : 'Déjalo vacío para utilizar leaf.'
+                        }
                         htmlFor="icon"
                         label="Icono"
                     >
-                        <Input
-                            id="icon"
-                            value={form.data.icon}
-                            onChange={(event) =>
-                                form.setData('icon', event.target.value)
-                            }
-                        />
+                        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+                            <Input
+                                id="icon"
+                                aria-invalid={Boolean(iconError)}
+                                value={form.data.icon}
+                                onChange={(event) => {
+                                    form.clearErrors('icon');
+                                    form.setData('icon', event.target.value);
+                                }}
+                            />
+                            <div
+                                aria-label={
+                                    hasInvalidIcon
+                                        ? 'Icono no reconocido'
+                                        : `Vista previa del icono ${resolvedIconName ?? 'leaf'}`
+                                }
+                                className="flex h-9 items-center justify-center gap-2 rounded-md border border-slate-200 bg-slate-50 px-3 text-slate-700 sm:min-w-28 dark:border-white/10 dark:bg-white/5 dark:text-slate-200"
+                                role="img"
+                            >
+                                {createElement(
+                                    hasInvalidIcon
+                                        ? CircleHelp
+                                        : getServiceIcon(form.data.icon),
+                                    {
+                                        'aria-hidden': true,
+                                        className: 'size-5',
+                                    },
+                                )}
+                                <span className="text-xs font-medium">
+                                    {hasInvalidIcon
+                                        ? 'No existe'
+                                        : (resolvedIconName ?? 'leaf')}
+                                </span>
+                            </div>
+                        </div>
                     </FormField>
                     <ImageUploadField
                         id="featured_image_upload"
-                        label="Imagen destacada"
+                        label="Imagen de cabecera"
                         currentImageUrl={service.featuredImage}
                         error={
                             form.errors.featured_image_upload ??
@@ -251,6 +396,56 @@ export function ServiceForm({ service, mode }: ServiceFormProps) {
                             form.setData('remove_featured_image', remove)
                         }
                     />
+                    <ImageUploadField
+                        id="logo_image_upload"
+                        label="Logo de la solución"
+                        currentImageUrl={service.logoImage}
+                        error={
+                            form.errors.logo_image_upload ??
+                            form.errors.logo_image
+                        }
+                        help="Logo opcional en JPG, PNG o WebP. Si falta, se usará el icono configurado."
+                        progress={form.progress?.percentage ?? null}
+                        remove={form.data.remove_logo_image}
+                        onFileChange={(file) =>
+                            form.setData('logo_image_upload', file)
+                        }
+                        onRemoveChange={(remove) =>
+                            form.setData('remove_logo_image', remove)
+                        }
+                    />
+                    <FormField
+                        error={form.errors.featured_image_alt}
+                        htmlFor="featured_image_alt"
+                        label="Texto alternativo"
+                    >
+                        <Input
+                            id="featured_image_alt"
+                            value={form.data.featured_image_alt}
+                            onChange={(event) =>
+                                form.setData(
+                                    'featured_image_alt',
+                                    event.target.value,
+                                )
+                            }
+                        />
+                    </FormField>
+                    <FormField
+                        error={form.errors.logo_image_alt}
+                        htmlFor="logo_image_alt"
+                        label="Texto alternativo del logo"
+                    >
+                        <Input
+                            id="logo_image_alt"
+                            value={form.data.logo_image_alt}
+                            onChange={(event) =>
+                                form.setData(
+                                    'logo_image_alt',
+                                    event.target.value,
+                                )
+                            }
+                        />
+                    </FormField>
                     <FormField
                         error={form.errors.seo_title}
                         htmlFor="seo_title"

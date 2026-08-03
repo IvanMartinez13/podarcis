@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { AdminFormSection } from '@/components/admin/admin-form-section';
 import { FormField } from '@/components/admin/form-field';
 import { ImageUploadField } from '@/components/admin/image-upload-field';
+import { SummernoteField } from '@/components/admin/summernote-field';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -121,20 +122,13 @@ export function TestimonialForm({ testimonial, mode }: TestimonialFormProps) {
                     />
                 </FormField>
 
-                <FormField
-                    error={form.errors.quote}
-                    htmlFor="quote"
+                <SummernoteField
+                    id="quote"
                     label="Testimonio"
-                >
-                    <textarea
-                        id="quote"
-                        className="min-h-44 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.quote}
-                        onChange={(event) =>
-                            form.setData('quote', event.target.value)
-                        }
-                    />
-                </FormField>
+                    error={form.errors.quote}
+                    value={form.data.quote}
+                    onChange={(value) => form.setData('quote', value)}
+                />
             </AdminFormSection>
 
             <AdminFormSection

@@ -2,6 +2,7 @@ import { Link, useForm } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 import { AdminFormSection } from '@/components/admin/admin-form-section';
 import { FormField } from '@/components/admin/form-field';
+import { SummernoteField } from '@/components/admin/summernote-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import * as categories from '@/routes/admin/categories';
@@ -79,20 +80,13 @@ export function CategoryForm({ category, mode }: CategoryFormProps) {
                     </FormField>
                 </div>
 
-                <FormField
-                    error={form.errors.description}
-                    htmlFor="description"
+                <SummernoteField
+                    id="description"
                     label="Descripción"
-                >
-                    <textarea
-                        id="description"
-                        className="min-h-32 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.description}
-                        onChange={(event) =>
-                            form.setData('description', event.target.value)
-                        }
-                    />
-                </FormField>
+                    error={form.errors.description}
+                    value={form.data.description}
+                    onChange={(value) => form.setData('description', value)}
+                />
 
                 <FormField error={form.errors.type} htmlFor="type" label="Tipo">
                     <select

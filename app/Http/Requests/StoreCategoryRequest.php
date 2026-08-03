@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\CmsHtmlSanitizer;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -24,6 +25,7 @@ class StoreCategoryRequest extends FormRequest
 
         $this->merge([
             'slug' => Str::slug($slug !== '' ? $slug : $name),
+            'description' => CmsHtmlSanitizer::cleanNullable($this->input('description')),
         ]);
     }
 

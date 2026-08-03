@@ -3,6 +3,7 @@ import type { FormEvent } from 'react';
 import { AdminFormSection } from '@/components/admin/admin-form-section';
 import { FormField } from '@/components/admin/form-field';
 import { ImageUploadField } from '@/components/admin/image-upload-field';
+import { SummernoteField } from '@/components/admin/summernote-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import * as successCases from '@/routes/admin/success-cases';
@@ -22,6 +23,9 @@ export type AdminSuccessCaseFormData = {
     solution: string;
     result: string;
     featuredImage: string;
+    featuredImageAlt?: string;
+    seoTitle?: string;
+    seoDescription?: string;
     serviceId: number | string | null;
     status: 'draft' | 'published';
     publishedAt: string;
@@ -43,8 +47,11 @@ type SuccessCaseFormPayload = {
     solution: string;
     result: string;
     featured_image: string;
+    featured_image_alt: string;
     featured_image_upload: File | null;
     remove_featured_image: boolean;
+    seo_title: string;
+    seo_description: string;
     service_id: string;
     status: 'draft' | 'published';
     published_at: string;
@@ -64,8 +71,11 @@ export function SuccessCaseForm({
         solution: successCase.solution ?? '',
         result: successCase.result ?? '',
         featured_image: successCase.featuredImage ?? '',
+        featured_image_alt: successCase.featuredImageAlt ?? '',
         featured_image_upload: null,
         remove_featured_image: false,
+        seo_title: successCase.seoTitle ?? '',
+        seo_description: successCase.seoDescription ?? '',
         service_id: successCase.serviceId ? String(successCase.serviceId) : '',
         status: successCase.status,
         published_at: successCase.publishedAt ?? '',
@@ -151,50 +161,29 @@ export function SuccessCaseForm({
                     </FormField>
                 </div>
 
-                <FormField
-                    error={form.errors.challenge}
-                    htmlFor="challenge"
+                <SummernoteField
+                    id="challenge"
                     label="Reto"
-                >
-                    <textarea
-                        id="challenge"
-                        className="min-h-36 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.challenge}
-                        onChange={(event) =>
-                            form.setData('challenge', event.target.value)
-                        }
-                    />
-                </FormField>
+                    error={form.errors.challenge}
+                    value={form.data.challenge}
+                    onChange={(value) => form.setData('challenge', value)}
+                />
 
-                <FormField
-                    error={form.errors.solution}
-                    htmlFor="solution"
+                <SummernoteField
+                    id="solution"
                     label="Solución"
-                >
-                    <textarea
-                        id="solution"
-                        className="min-h-36 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.solution}
-                        onChange={(event) =>
-                            form.setData('solution', event.target.value)
-                        }
-                    />
-                </FormField>
+                    error={form.errors.solution}
+                    value={form.data.solution}
+                    onChange={(value) => form.setData('solution', value)}
+                />
 
-                <FormField
-                    error={form.errors.result}
-                    htmlFor="result"
+                <SummernoteField
+                    id="result"
                     label="Resultado"
-                >
-                    <textarea
-                        id="result"
-                        className="min-h-36 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
-                        value={form.data.result}
-                        onChange={(event) =>
-                            form.setData('result', event.target.value)
-                        }
-                    />
-                </FormField>
+                    error={form.errors.result}
+                    value={form.data.result}
+                    onChange={(value) => form.setData('result', value)}
+                />
             </AdminFormSection>
 
             <AdminFormSection
@@ -261,8 +250,8 @@ export function SuccessCaseForm({
             </AdminFormSection>
 
             <AdminFormSection
-                title="Imagen"
-                description="Usaremos una URL externa o placeholder hasta incorporar media library."
+                title="Imagen y SEO"
+                description="Presentación visual y metadatos del caso publicado."
             >
                 <ImageUploadField
                     id="featured_image_upload"
@@ -279,6 +268,44 @@ export function SuccessCaseForm({
                     }
                     onRemoveChange={(remove) =>
                         form.setData('remove_featured_image', remove)
+                    }
+                />
+                <FormField
+                    error={form.errors.featured_image_alt}
+                    htmlFor="featured_image_alt"
+                    label="Texto alternativo"
+                >
+                    <Input
+                        id="featured_image_alt"
+                        value={form.data.featured_image_alt}
+                        onChange={(event) =>
+                            form.setData(
+                                'featured_image_alt',
+                                event.target.value,
+                            )
+                        }
+                    />
+                </FormField>
+                <FormField
+                    error={form.errors.seo_title}
+                    htmlFor="seo_title"
+                    label="SEO title"
+                >
+                    <Input
+                        id="seo_title"
+                        value={form.data.seo_title}
+                        onChange={(event) =>
+                            form.setData('seo_title', event.target.value)
+                        }
+                    />
+                </FormField>
+                <SummernoteField
+                    id="seo_description"
+                    label="SEO description"
+                    error={form.errors.seo_description}
+                    value={form.data.seo_description}
+                    onChange={(value) =>
+                        form.setData('seo_description', value)
                     }
                 />
             </AdminFormSection>

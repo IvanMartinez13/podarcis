@@ -1,8 +1,10 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 
 import { Container } from '@/components/public/container';
 import { CTASection } from '@/components/public/cta-section';
 import { PublicHero } from '@/components/public/public-hero';
+import { RichText } from '@/components/public/rich-text';
+import { SeoHead } from '@/components/public/seo-head';
 import { Badge } from '@/components/ui/badge';
 import * as blog from '@/routes/blog';
 import * as contact from '@/routes/contact';
@@ -15,19 +17,25 @@ type BlogShowProps = {
 export default function BlogShow({ post }: BlogShowProps) {
     return (
         <>
-            <Head title={post.seoTitle ?? post.title}>
-                {post.seoDescription && (
-                    <meta
-                        content={post.seoDescription}
-                        head-key="description"
-                        name="description"
-                    />
-                )}
-            </Head>
+            <SeoHead
+                title={post.seoTitle ?? post.title}
+                description={post.seoDescription ?? post.excerpt}
+                image={post.featuredImage}
+                jsonLd={{
+                    '@context': 'https://schema.org',
+                    '@type': 'Article',
+                    headline: post.title,
+                    description: post.seoDescription ?? post.excerpt,
+                    datePublished: post.publishedAt,
+                    author: post.author
+                        ? { '@type': 'Person', name: post.author.name }
+                        : { '@type': 'Organization', name: 'PODARCIS' },
+                }}
+            />
 
             <article>
-                <PublicHero as="header" className="py-16 sm:py-20">
-                    <Container className="max-w-4xl">
+                <PublicHero as="header">
+                    <Container className="max-w-4xl py-16 sm:py-20 lg:py-24">
                         <Link
                             className="text-sm font-semibold text-podarcis-green"
                             href={blog.index()}
@@ -40,31 +48,28 @@ export default function BlogShow({ post }: BlogShowProps) {
                         <h1 className="mt-6 text-4xl font-semibold text-balance sm:text-5xl">
                             {post.title}
                         </h1>
-                        <p className="mt-6 text-lg leading-8 text-white/75">
-                            {post.excerpt}
-                        </p>
+                        <RichText
+                            className="mt-6 text-lg leading-8 text-white/75 [&_a]:text-white [&_a]:decoration-white/50"
+                            html={post.excerpt}
+                        />
                     </Container>
                 </PublicHero>
 
                 <Container className="py-12 sm:py-16">
-                    <img
-                        alt=""
-                        className="aspect-[16/8] w-full rounded-lg object-cover shadow-xl shadow-slate-950/10"
-                        src={
-                            post.featuredImage ??
-                            'https://placehold.co/1200x680/F4F7F8/163247?text=Blog+PODARCIS'
-                        }
+                    {post.featuredImage && (
+                        <img
+                            alt={post.imageAlt ?? ''}
+                            className="aspect-[16/8] w-full rounded-3xl object-cover shadow-xl shadow-slate-950/10"
+                            src={post.featuredImage}
+                            width="1200"
+                            height="600"
+                            fetchPriority="high"
+                        />
+                    )}
+                    <RichText
+                        className="mx-auto mt-10 max-w-3xl text-lg leading-8 text-podarcis-muted"
+                        html={post.content}
                     />
-                    <div className="mx-auto mt-10 max-w-3xl text-lg leading-8 text-podarcis-muted">
-                        {(post.content ?? '')
-                            .split('\n')
-                            .filter(Boolean)
-                            .map((paragraph) => (
-                                <p className="mt-6" key={paragraph}>
-                                    {paragraph}
-                                </p>
-                            ))}
-                    </div>
                 </Container>
             </article>
 

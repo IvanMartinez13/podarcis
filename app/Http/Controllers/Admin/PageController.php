@@ -59,6 +59,14 @@ class PageController extends Controller
             'remove_team_cover_image',
             'team_member_avatar_uploads',
             'remove_team_member_avatars',
+            'hero_image_upload',
+            'remove_hero_image',
+            'digital_image_upload',
+            'remove_digital_image',
+            'success_cases_background_image_upload',
+            'remove_success_cases_background_image',
+            'testimonials_background_image_upload',
+            'remove_testimonials_background_image',
         ]);
 
         if ($request->hasFile('og_image_upload')) {
@@ -90,6 +98,14 @@ class PageController extends Controller
             'remove_team_cover_image',
             'team_member_avatar_uploads',
             'remove_team_member_avatars',
+            'hero_image_upload',
+            'remove_hero_image',
+            'digital_image_upload',
+            'remove_digital_image',
+            'success_cases_background_image_upload',
+            'remove_success_cases_background_image',
+            'testimonials_background_image_upload',
+            'remove_testimonials_background_image',
         ]);
 
         if ($request->hasFile('og_image_upload')) {
@@ -180,6 +196,7 @@ class PageController extends Controller
         return match ($page->slug) {
             'quienes-somos' => route('pages.about'),
             'contacto' => route('contact.index'),
+            'soluciones-digitales' => route('digital-solutions.index'),
             default => null,
         };
     }
@@ -191,11 +208,40 @@ class PageController extends Controller
      */
     private function processBlocks(Request $request, ?array $blocks, ?array $oldBlocks): ?array
     {
-        if ($blocks === null) {
+        $hasFixedBlockUpload = $request->hasAny([
+            'hero_image_upload',
+            'digital_image_upload',
+            'success_cases_background_image_upload',
+            'testimonials_background_image_upload',
+        ]);
+
+        if ($blocks === null && ! $hasFixedBlockUpload) {
             return null;
         }
 
+        $blocks ??= [];
         $oldBlocks ??= [];
+        $blocks = $this->processFixedBlockImage($request, $blocks, $oldBlocks, 'hero.image', 'hero_image_upload', 'remove_hero_image', 'cms/pages/home/hero');
+        $blocks = $this->processFixedBlockImage($request, $blocks, $oldBlocks, 'digital.image', 'digital_image_upload', 'remove_digital_image', 'cms/pages/home/digital');
+        $blocks = $this->processFixedBlockImage(
+            $request,
+            $blocks,
+            $oldBlocks,
+            'successCases.backgroundImage',
+            'success_cases_background_image_upload',
+            'remove_success_cases_background_image',
+            'cms/pages/home/success-cases',
+        );
+        $blocks = $this->processFixedBlockImage(
+            $request,
+            $blocks,
+            $oldBlocks,
+            'testimonials.backgroundImage',
+            'testimonials_background_image_upload',
+            'remove_testimonials_background_image',
+            'cms/pages/home/testimonials',
+        );
+
         $oldTeamCoverImage = is_string($oldBlocks['teamCoverImage'] ?? null) ? $oldBlocks['teamCoverImage'] : null;
 
         if ($request->hasFile('team_cover_image_upload')) {
@@ -247,6 +293,14 @@ class PageController extends Controller
             $blocks['teamCoverImage'] = $this->images->url($blocks['teamCoverImage']);
         }
 
+        foreach (['hero.image', 'digital.image', 'successCases.backgroundImage', 'testimonials.backgroundImage'] as $path) {
+            $image = data_get($blocks, $path);
+
+            if (is_string($image)) {
+                data_set($blocks, $path, $this->images->url($image));
+            }
+        }
+
         $members = is_array($blocks['teamMembers'] ?? null) ? $blocks['teamMembers'] : [];
 
         $blocks['teamMembers'] = collect($members)
@@ -274,6 +328,11 @@ class PageController extends Controller
 
         $this->images->delete(is_string($blocks['teamCoverImage'] ?? null) ? $blocks['teamCoverImage'] : null);
 
+        foreach (['hero.image', 'digital.image', 'successCases.backgroundImage', 'testimonials.backgroundImage', 'finalCta.image'] as $path) {
+            $image = data_get($blocks, $path);
+            $this->images->delete(is_string($image) ? $image : null);
+        }
+
         foreach ($blocks['teamMembers'] ?? [] as $member) {
             if (is_array($member)) {
                 $this->images->delete(is_string($member['avatarUrl'] ?? null) ? $member['avatarUrl'] : null);
@@ -292,8 +351,37 @@ class PageController extends Controller
             'title' => $member['title'] ?? null,
             'handle' => $member['handle'] ?? null,
             'status' => $member['status'] ?? null,
-            'contactText' => $member['contactText'] ?? null,
+            'linkedinUrl' => $member['linkedinUrl'] ?? null,
             'avatarUrl' => $member['avatarUrl'] ?? null,
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $blocks
+     * @param  array<string, mixed>  $oldBlocks
+     * @return array<string, mixed>
+     */
+    private function processFixedBlockImage(
+        Request $request,
+        array $blocks,
+        array $oldBlocks,
+        string $blockPath,
+        string $uploadField,
+        string $removeField,
+        string $directory,
+    ): array {
+        $oldImage = data_get($oldBlocks, $blockPath);
+        $oldImage = is_string($oldImage) ? $oldImage : null;
+
+        if ($request->hasFile($uploadField)) {
+            data_set($blocks, $blockPath, $this->images->store($request->file($uploadField), $directory, $oldImage));
+        } elseif ($request->boolean($removeField)) {
+            $this->images->delete($oldImage);
+            data_set($blocks, $blockPath, null);
+        } elseif ($oldImage !== null) {
+            data_set($blocks, $blockPath, $oldImage);
+        }
+
+        return $blocks;
     }
 }

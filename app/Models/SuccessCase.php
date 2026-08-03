@@ -20,13 +20,16 @@ use Illuminate\Support\Carbon;
  * @property string|null $solution
  * @property string|null $result
  * @property string|null $featured_image
+ * @property string|null $featured_image_alt
  * @property int|null $service_id
+ * @property string|null $seo_title
+ * @property string|null $seo_description
  * @property string $status
  * @property Carbon|null $published_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['title', 'slug', 'client_name', 'sector', 'challenge', 'solution', 'result', 'featured_image', 'service_id', 'status', 'published_at'])]
+#[Fillable(['title', 'slug', 'client_name', 'sector', 'challenge', 'solution', 'result', 'featured_image', 'featured_image_alt', 'service_id', 'seo_title', 'seo_description', 'status', 'published_at'])]
 class SuccessCase extends Model
 {
     /** @use HasFactory<SuccessCaseFactory> */

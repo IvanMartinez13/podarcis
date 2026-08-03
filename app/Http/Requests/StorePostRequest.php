@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Support\CmsHtmlSanitizer;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -26,6 +27,9 @@ class StorePostRequest extends FormRequest
 
         $this->merge([
             'slug' => Str::slug($slug !== '' ? $slug : $title),
+            'excerpt' => CmsHtmlSanitizer::cleanNullable($this->input('excerpt')),
+            'content' => CmsHtmlSanitizer::cleanNullable($this->input('content')),
+            'seo_description' => CmsHtmlSanitizer::cleanNullable($this->input('seo_description')),
             'published_at' => $status === 'published' && blank($this->input('published_at'))
                 ? now()
                 : $this->input('published_at'),
@@ -46,6 +50,7 @@ class StorePostRequest extends FormRequest
             'excerpt' => ['nullable', 'string'],
             'content' => ['required', 'string'],
             'featured_image' => ['nullable', 'string', 'max:255'],
+            'featured_image_alt' => ['nullable', 'string', 'max:255'],
             'featured_image_upload' => ['nullable', File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(5 * 1024)],
             'remove_featured_image' => ['boolean'],
             'category_id' => ['nullable', 'integer', Rule::exists('categories', 'id')->where('type', 'post')],

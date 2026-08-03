@@ -1,25 +1,31 @@
-import { cn } from '@/lib/utils';
+import { Linkedin } from 'lucide-react';
 
-const TEAM_AVATAR_PLACEHOLDER =
-    'https://placehold.co/720x1000/163247/FFFFFF?text=PODARCIS';
+import { PublicLink } from '@/components/public/public-link';
+import { cn } from '@/lib/utils';
 
 type ProfileCardProps = {
     avatarUrl?: string | null;
     className?: string;
-    contactText?: string | null;
-    handle?: string | null;
+    linkedinUrl?: string | null;
     name: string;
-    onContactClick?: () => void;
-    status?: string | null;
     title?: string | null;
 };
 
 export default function ProfileCard({
     avatarUrl,
     className,
+    linkedinUrl,
     name,
     title,
 }: ProfileCardProps) {
+    const initials = name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase();
+
     return (
         <article
             className={cn(
@@ -33,12 +39,18 @@ export default function ProfileCard({
             <div className="pointer-events-none absolute -top-20 left-1/2 h-56 w-56 -translate-x-1/2 rounded-full bg-podarcis-green/20 blur-3xl transition-opacity duration-500 group-hover:opacity-90" />
 
             <div className="relative flex min-h-0 flex-1 items-end justify-center rounded-xl bg-linear-to-b from-podarcis-navy/10 via-white/10 to-podarcis-navy/5">
-                <img
-                    alt={name}
-                    className="absolute inset-x-0 bottom-0 mx-auto h-[88%] w-full object-contain object-bottom drop-shadow-[0_26px_34px_rgba(14,37,53,0.22)] transition-transform duration-500 ease-out group-hover:translate-y-[-6px] group-hover:scale-[1.03]"
-                    loading="lazy"
-                    src={avatarUrl?.trim() || TEAM_AVATAR_PLACEHOLDER}
-                />
+                {avatarUrl?.trim() ? (
+                    <img
+                        alt={name}
+                        className="absolute inset-x-0 bottom-0 mx-auto h-[88%] w-full object-contain object-bottom drop-shadow-[0_26px_34px_rgba(14,37,53,0.22)] transition-transform duration-500 ease-out group-hover:translate-y-[-6px] group-hover:scale-[1.03]"
+                        loading="lazy"
+                        src={avatarUrl}
+                    />
+                ) : (
+                    <span className="mb-28 grid size-28 place-items-center rounded-full border border-white/60 bg-podarcis-navy text-3xl font-semibold tracking-[0.12em] text-white shadow-xl">
+                        {initials}
+                    </span>
+                )}
             </div>
 
             <div className="absolute bottom-5 left-1/2 w-[min(calc(100%-2rem),230px)] -translate-x-1/2 rounded-xl border border-white/55 bg-white/70 p-3 text-center shadow-[0_14px_40px_rgba(14,37,53,0.14)] backdrop-blur-xl">
@@ -53,6 +65,16 @@ export default function ProfileCard({
                             </p>
                         )}
                     </div>
+                    {linkedinUrl?.trim() && (
+                        <PublicLink
+                            aria-label={`LinkedIn de ${name}`}
+                            className="mt-1 inline-flex items-center gap-1.5 rounded-sm text-xs font-semibold text-podarcis-navy underline decoration-podarcis-green decoration-2 underline-offset-4 transition-colors hover:text-podarcis-green focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-podarcis-green"
+                            href={linkedinUrl}
+                        >
+                            <Linkedin className="size-3.5" aria-hidden="true" />
+                            <span>LinkedIn</span>
+                        </PublicLink>
+                    )}
                 </div>
             </div>
         </article>

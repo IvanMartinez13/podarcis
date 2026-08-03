@@ -60,7 +60,11 @@ export function UserForm({ user, mode }: UserFormProps) {
                 description="Gestiona usuarios internos que acceden al CMS corporativo."
             >
                 <div className="grid gap-5 lg:grid-cols-2">
-                    <FormField error={form.errors.name} htmlFor="name" label="Nombre">
+                    <FormField
+                        error={form.errors.name}
+                        htmlFor="name"
+                        label="Nombre"
+                    >
                         <Input
                             id="name"
                             value={form.data.name}
@@ -69,7 +73,11 @@ export function UserForm({ user, mode }: UserFormProps) {
                             }
                         />
                     </FormField>
-                    <FormField error={form.errors.email} htmlFor="email" label="Email">
+                    <FormField
+                        error={form.errors.email}
+                        htmlFor="email"
+                        label="Email"
+                    >
                         <Input
                             id="email"
                             type="email"

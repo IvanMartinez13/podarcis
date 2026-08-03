@@ -34,12 +34,23 @@ class ServiceController extends Controller
 
     public function store(StoreServiceRequest $request): RedirectResponse
     {
-        $data = $request->safe()->except(['featured_image_upload', 'remove_featured_image']);
+        $data = $request->safe()->except([
+            'featured_image_upload',
+            'remove_featured_image',
+            'logo_image_upload',
+            'remove_logo_image',
+        ]);
 
         if ($request->hasFile('featured_image_upload')) {
             $data['featured_image'] = $this->images->store($request->file('featured_image_upload'), 'cms/services');
         } elseif (blank($data['featured_image'] ?? null)) {
             $data['featured_image'] = null;
+        }
+
+        if ($request->hasFile('logo_image_upload')) {
+            $data['logo_image'] = $this->images->store($request->file('logo_image_upload'), 'cms/services/logos', preservePng: true);
+        } elseif (blank($data['logo_image'] ?? null)) {
+            $data['logo_image'] = null;
         }
 
         Service::query()->create($data);
@@ -56,7 +67,12 @@ class ServiceController extends Controller
 
     public function update(UpdateServiceRequest $request, Service $service): RedirectResponse
     {
-        $data = $request->safe()->except(['featured_image_upload', 'remove_featured_image']);
+        $data = $request->safe()->except([
+            'featured_image_upload',
+            'remove_featured_image',
+            'logo_image_upload',
+            'remove_logo_image',
+        ]);
 
         if ($request->hasFile('featured_image_upload')) {
             $data['featured_image'] = $this->images->store($request->file('featured_image_upload'), 'cms/services', $service->featured_image);
@@ -67,6 +83,20 @@ class ServiceController extends Controller
             unset($data['featured_image']);
         }
 
+        if ($request->hasFile('logo_image_upload')) {
+            $data['logo_image'] = $this->images->store(
+                $request->file('logo_image_upload'),
+                'cms/services/logos',
+                $service->logo_image,
+                preservePng: true,
+            );
+        } elseif ($request->boolean('remove_logo_image')) {
+            $this->images->delete($service->logo_image);
+            $data['logo_image'] = null;
+        } else {
+            unset($data['logo_image']);
+        }
+
         $service->update($data);
 
         return to_route('admin.services.index')->with('success', 'Servicio actualizado correctamente.');
@@ -75,6 +105,7 @@ class ServiceController extends Controller
     public function destroy(Service $service): RedirectResponse
     {
         $this->images->delete($service->featured_image);
+        $this->images->delete($service->logo_image);
 
         $service->delete();
 
@@ -90,6 +121,7 @@ class ServiceController extends Controller
             'id' => $service->id,
             'title' => $service->title,
             'slug' => $service->slug,
+            'kind' => $service->kind,
             'status' => $service->status,
             'isFeatured' => $service->is_featured,
             'sortOrder' => $service->sort_order,
@@ -106,10 +138,15 @@ class ServiceController extends Controller
             'id' => $service->id,
             'title' => $service->title,
             'slug' => $service->slug,
+            'kind' => $service->kind,
             'excerpt' => $service->excerpt,
             'description' => $service->description,
             'icon' => $service->icon,
             'featuredImage' => $this->images->url($service->featured_image),
+            'featuredImageAlt' => $service->featured_image_alt,
+            'logoImage' => $this->images->url($service->logo_image),
+            'logoImageAlt' => $service->logo_image_alt,
+            'blocks' => $service->blocks,
             'seoTitle' => $service->seo_title,
             'seoDescription' => $service->seo_description,
             'isFeatured' => $service->is_featured,
@@ -128,10 +165,15 @@ class ServiceController extends Controller
             'id' => null,
             'title' => '',
             'slug' => '',
+            'kind' => 'consulting',
             'excerpt' => '',
             'description' => '',
             'icon' => '',
             'featuredImage' => '',
+            'featuredImageAlt' => '',
+            'logoImage' => '',
+            'logoImageAlt' => '',
+            'blocks' => null,
             'seoTitle' => '',
             'seoDescription' => '',
             'isFeatured' => false,

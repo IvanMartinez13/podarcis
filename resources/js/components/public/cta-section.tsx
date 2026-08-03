@@ -1,6 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 
 import { Container } from '@/components/public/container';
+import { PublicLink } from '@/components/public/public-link';
 import { Button } from '@/components/ui/button';
 
 type CTASectionProps = {
@@ -25,13 +26,13 @@ function CTASection({
             id="contacto"
             className="relative overflow-hidden bg-podarcis-navy-dark py-16 text-white sm:py-20"
         >
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(37,227,49,0.18),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_45%)]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(37,227,49,0.16),transparent_30%),linear-gradient(135deg,rgba(255,255,255,0.06),transparent_48%)]" />
             <div className="absolute right-10 bottom-8 hidden h-36 w-36 rounded-full border border-podarcis-green/20 lg:block" />
             <Container>
-                <div className="relative grid gap-8 rounded-lg border border-white/10 bg-white/10 p-8 shadow-2xl shadow-black/20 backdrop-blur lg:grid-cols-[1fr_auto] lg:items-center lg:p-10">
+                <div className="relative grid gap-8 rounded-2xl border border-white/12 bg-white/6 p-7 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-9 lg:grid-cols-[1fr_auto] lg:items-center lg:p-11">
                     <div className="max-w-3xl">
                         <p className="text-sm font-semibold text-podarcis-green">
-                            Contacto comercial
+                            Contacto
                         </p>
                         <h2 className="mt-3 text-3xl font-semibold sm:text-4xl">
                             {title}
@@ -46,13 +47,13 @@ function CTASection({
                             className="bg-podarcis-green text-podarcis-navy shadow-lg shadow-podarcis-green/25 transition duration-300 hover:-translate-y-0.5 hover:bg-podarcis-green/90"
                             size="lg"
                         >
-                            <a href={primaryHref}>
+                            <PublicLink href={primaryHref}>
                                 {primaryLabel}
                                 <ArrowRight
                                     className="size-4"
                                     aria-hidden="true"
                                 />
-                            </a>
+                            </PublicLink>
                         </Button>
                         {secondaryHref && secondaryLabel && (
                             <Button
@@ -61,7 +62,9 @@ function CTASection({
                                 size="lg"
                                 variant="outline"
                             >
-                                <a href={secondaryHref}>{secondaryLabel}</a>
+                                <PublicLink href={secondaryHref}>
+                                    {secondaryLabel}
+                                </PublicLink>
                             </Button>
                         )}
                     </div>

@@ -1,12 +1,14 @@
-import { Head, Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { createElement } from 'react';
 
+import { CaseStudyCard } from '@/components/public/case-study-card';
 import { Container } from '@/components/public/container';
 import { CTASection } from '@/components/public/cta-section';
-import { EmptyState } from '@/components/public/empty-state';
 import { PublicHero } from '@/components/public/public-hero';
+import { RichText } from '@/components/public/rich-text';
 import { Section } from '@/components/public/section';
+import { SeoHead } from '@/components/public/seo-head';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getServiceIcon } from '@/lib/cms-icons';
@@ -23,34 +25,66 @@ export default function ServiceShow({
     service,
     successCases,
 }: ServiceShowProps) {
+    const benefits = service.blocks?.benefits ?? [];
+
     return (
         <>
-            <Head title={service.seoTitle ?? service.title}>
-                {service.seoDescription && (
-                    <meta
-                        content={service.seoDescription}
-                        head-key="description"
-                        name="description"
-                    />
-                )}
-            </Head>
+            <SeoHead
+                title={service.seoTitle ?? service.title}
+                description={service.seoDescription ?? service.excerpt}
+                image={service.featuredImage}
+                jsonLd={{
+                    '@context': 'https://schema.org',
+                    '@type': 'Service',
+                    name: service.title,
+                    description: service.seoDescription ?? service.excerpt,
+                    provider: {
+                        '@type': 'Organization',
+                        name: 'PODARCIS',
+                    },
+                }}
+            />
 
-            <PublicHero className="py-16 sm:py-20">
-                <Container className="grid gap-10 lg:grid-cols-[1fr_0.8fr] lg:items-center">
-                    <div>
-                        <Badge className="bg-podarcis-green text-podarcis-navy">
-                            Servicio PODARCIS
+            <PublicHero as="header" backgroundImage={service.featuredImage}>
+                <Container className="py-16 sm:py-20 lg:py-24">
+                    <div className="max-w-4xl">
+                        <Badge className="bg-podarcis-green text-podarcis-ink">
+                            {service.kind === 'digital'
+                                ? 'Solución digital'
+                                : 'Servicio'}
                         </Badge>
-                        <h1 className="mt-6 max-w-3xl text-4xl font-semibold text-balance sm:text-5xl">
-                            {service.title}
-                        </h1>
-                        <p className="mt-6 max-w-2xl text-lg leading-8 text-white/75">
-                            {service.excerpt}
-                        </p>
+                        <div className="mt-6 flex items-start gap-4">
+                            {service.logoImage && (
+                                <img
+                                    alt={service.logoImageAlt ?? ''}
+                                    className="max-h-14 max-w-40 shrink-0 rounded-lg border border-white/12 bg-white/6 object-contain object-left p-2"
+                                    height="56"
+                                    loading="lazy"
+                                    src={service.logoImage}
+                                    width="160"
+                                />
+                            )}
+                            <div className="flex items-center gap-3">
+                                {createElement(getServiceIcon(service.icon), {
+                                    'aria-hidden': true,
+                                    className:
+                                        'size-8 shrink-0 text-podarcis-green sm:size-9',
+                                })}
+                                <h1 className="max-w-3xl text-4xl leading-tight font-semibold text-balance sm:text-5xl lg:text-6xl">
+                                    {service.title}
+                                </h1>
+                            </div>
+                        </div>
+                        {service.excerpt && (
+                            <RichText
+                                className="mt-6 max-w-2xl text-lg leading-8 text-white/68 [&_a]:text-white [&_a]:decoration-white/50"
+                                html={service.excerpt}
+                            />
+                        )}
                         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                             <Button
                                 asChild
-                                className="bg-podarcis-green text-podarcis-navy shadow-xl shadow-podarcis-green/25 transition duration-300 hover:-translate-y-0.5 hover:bg-podarcis-green/90 hover:shadow-podarcis-green/40"
+                                className="bg-podarcis-green text-podarcis-ink hover:bg-podarcis-green/90"
                             >
                                 <Link
                                     href={contact.index({
@@ -58,10 +92,7 @@ export default function ServiceShow({
                                     })}
                                 >
                                     Solicitar asesoramiento
-                                    <ArrowRight
-                                        className="size-4"
-                                        aria-hidden="true"
-                                    />
+                                    <ArrowRight className="size-4" />
                                 </Link>
                             </Button>
                             <Button
@@ -75,98 +106,78 @@ export default function ServiceShow({
                             </Button>
                         </div>
                     </div>
-                    <div className="rounded-lg border border-white/10 bg-white/5 p-8 shadow-2xl shadow-black/15 backdrop-blur-[2px]">
-                        {createElement(getServiceIcon(service.icon), {
-                            'aria-hidden': true,
-                            className: 'size-12 text-podarcis-green',
-                        })}
-                        <img
-                            alt=""
-                            className="mt-8 aspect-[4/3] w-full rounded-md object-cover"
-                            src={
-                                service.featuredImage ??
-                                'https://placehold.co/900x680/163247/FFFFFF?text=Servicio+PODARCIS'
-                            }
-                        />
-                    </div>
                 </Container>
             </PublicHero>
 
             <Section
-                eyebrow="Detalle"
-                title="Un servicio pensado para pasar del diagnóstico a la acción"
+                eyebrow="En detalle"
+                title="Del diagnóstico a una solución aplicable"
+                description={service.blocks?.detail ?? undefined}
             >
-                <div className="grid gap-8 lg:grid-cols-[0.7fr_1fr]">
-                    <div className="rounded-lg bg-podarcis-surface p-6">
-                        {[
-                            'Diagnóstico técnico',
-                            'Documentación trazable',
-                            'Seguimiento operativo',
-                        ].map((item) => (
-                            <div
-                                className="flex gap-3 border-b border-slate-200 py-4 last:border-0"
-                                key={item}
-                            >
-                                <CheckCircle2
-                                    className="mt-0.5 size-5 text-podarcis-green"
-                                    aria-hidden="true"
-                                />
-                                <span className="font-medium text-podarcis-navy">
-                                    {item}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="prose prose-slate max-w-none">
-                        {(service.description ?? service.excerpt ?? '')
-                            .split('\n')
-                            .map((paragraph) => (
-                                <p key={paragraph}>{paragraph}</p>
+                <div
+                    className={
+                        benefits.length > 0
+                            ? 'grid gap-10 lg:grid-cols-[.65fr_1fr]'
+                            : 'mx-auto max-w-4xl'
+                    }
+                >
+                    {benefits.length > 0 && (
+                        <div className="rounded-2xl bg-podarcis-surface p-6">
+                            {benefits.map((item) => (
+                                <div
+                                    className="flex gap-3 border-b border-slate-200 py-4 last:border-0"
+                                    key={item.id}
+                                >
+                                    <CheckCircle2
+                                        className="mt-0.5 size-5 text-emerald-600"
+                                        aria-hidden="true"
+                                    />
+                                    <span>
+                                        <span className="font-medium text-podarcis-navy">
+                                            {item.title}
+                                        </span>
+                                        {item.description && (
+                                            <span className="mt-1 block text-sm leading-6 text-podarcis-muted">
+                                                {item.description}
+                                            </span>
+                                        )}
+                                    </span>
+                                </div>
                             ))}
-                    </div>
+                        </div>
+                    )}
+                    <RichText
+                        className="text-lg leading-8 text-podarcis-muted"
+                        html={service.description ?? service.excerpt}
+                    />
                 </div>
             </Section>
 
-            <Section
-                eyebrow="Casos relacionados"
-                title="Aplicaciones reales de este servicio"
-                className="bg-podarcis-surface"
-            >
-                {successCases.length > 0 ? (
+            {successCases.length > 0 && (
+                <Section
+                    surface="navy"
+                    eyebrow="Casos relacionados"
+                    title="Aplicaciones reales de este servicio"
+                >
                     <div className="grid gap-5 lg:grid-cols-3">
                         {successCases.map((successCase) => (
-                            <Link
-                                className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
-                                href={successCase.href}
+                            <CaseStudyCard
                                 key={successCase.slug}
-                            >
-                                <Badge className="bg-podarcis-surface text-podarcis-navy">
-                                    {successCase.sector ?? 'Caso'}
-                                </Badge>
-                                <h3 className="mt-4 text-xl font-semibold text-podarcis-navy">
-                                    {successCase.title}
-                                </h3>
-                                <p className="mt-3 text-sm leading-6 text-podarcis-muted">
-                                    {successCase.excerpt ?? successCase.result}
-                                </p>
-                            </Link>
+                                successCase={successCase}
+                            />
                         ))}
                     </div>
-                ) : (
-                    <EmptyState
-                        title="Sin casos relacionados publicados"
-                        description="Los casos asociados a este servicio aparecerán aquí cuando se publiquen."
-                    />
-                )}
-            </Section>
+                </Section>
+            )}
 
             <CTASection
                 title="Hablemos de este servicio"
-                description="Revisamos tu punto de partida y te proponemos un camino práctico."
+                description="Revisamos tu punto de partida y proponemos un camino técnico viable."
                 primaryHref={
+                    service.blocks?.cta?.href ??
                     contact.index({ query: { service: service.slug } }).url
                 }
-                primaryLabel="Contactar"
+                primaryLabel={service.blocks?.cta?.label ?? 'Contactar'}
             />
         </>
     );

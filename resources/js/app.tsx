@@ -16,6 +16,7 @@ createInertiaApp({
         switch (true) {
             case name === 'welcome':
             case name.startsWith('services/'):
+            case name.startsWith('digital-solutions/'):
             case name.startsWith('blog/'):
             case name.startsWith('success-cases/'):
             case name.startsWith('pages/'):
