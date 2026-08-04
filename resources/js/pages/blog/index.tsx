@@ -1,14 +1,23 @@
 import { Container } from '@/components/public/container';
+import { Pagination } from '@/components/public/pagination';
+import type { PaginationLink } from '@/components/public/pagination';
 import { PostCard } from '@/components/public/post-card';
 import { PublicHero } from '@/components/public/public-hero';
 import { Reveal } from '@/components/public/reveal';
 import { Section } from '@/components/public/section';
 import { SeoHead } from '@/components/public/seo-head';
+import * as blog from '@/routes/blog';
 import type { CmsPage, CmsPost } from '@/types';
 
 type BlogIndexProps = {
     page?: CmsPage | null;
-    posts: CmsPost[];
+    posts: {
+        data: CmsPost[];
+        links: PaginationLink[];
+        current_page: number;
+        next_page_url: string | null;
+        prev_page_url: string | null;
+    };
 };
 
 export default function BlogIndex({ page, posts }: BlogIndexProps) {
@@ -25,6 +34,14 @@ export default function BlogIndex({ page, posts }: BlogIndexProps) {
                 title={page?.seoTitle ?? 'Recursos'}
                 description={page?.seoDescription ?? excerpt}
                 image={page?.ogImage}
+                canonical={
+                    posts.current_page > 1
+                        ? blog.index({ query: { page: posts.current_page } })
+                              .url
+                        : blog.index().url
+                }
+                next={posts.next_page_url}
+                previous={posts.prev_page_url}
             />
             <PublicHero as="header">
                 <Container className="py-16 sm:py-20 lg:py-24">
@@ -40,13 +57,14 @@ export default function BlogIndex({ page, posts }: BlogIndexProps) {
                 </Container>
             </PublicHero>
 
-            {posts.length > 0 && (
+            {posts.data.length > 0 && (
                 <Section>
                     <Reveal className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-                        {posts.map((post) => (
+                        {posts.data.map((post) => (
                             <PostCard key={post.slug} post={post} />
                         ))}
                     </Reveal>
+                    <Pagination links={posts.links} />
                 </Section>
             )}
         </>

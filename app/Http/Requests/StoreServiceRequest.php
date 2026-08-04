@@ -28,6 +28,20 @@ class StoreServiceRequest extends FormRequest
 
         if (is_array($blocks)) {
             $blocks['detail'] = CmsHtmlSanitizer::cleanNullable($blocks['detail'] ?? null);
+            $blocks['localContext'] = CmsHtmlSanitizer::cleanNullable($blocks['localContext'] ?? null);
+            $faqs = $blocks['faqs'] ?? [];
+
+            if (is_array($faqs)) {
+                $blocks['faqs'] = array_map(function (mixed $faq): mixed {
+                    if (! is_array($faq)) {
+                        return $faq;
+                    }
+
+                    $faq['answer'] = CmsHtmlSanitizer::cleanNullable($faq['answer'] ?? null);
+
+                    return $faq;
+                }, $faqs);
+            }
         }
 
         $this->merge([
@@ -65,13 +79,19 @@ class StoreServiceRequest extends FormRequest
             'logo_image_alt' => ['nullable', 'string', 'max:255'],
             'logo_image_upload' => ['nullable', File::image()->types(['jpg', 'jpeg', 'png', 'webp'])->max(3 * 1024)],
             'remove_logo_image' => ['boolean'],
-            'blocks' => ['nullable', 'array:benefits,detail,cta'],
+            'blocks' => ['nullable', 'array:benefits,detail,cta,localContext,faqs'],
             'blocks.benefits' => ['nullable', 'array', 'max:8'],
             'blocks.benefits.*' => ['array:id,title,description'],
             'blocks.benefits.*.id' => ['required', 'string', 'max:80', 'distinct'],
             'blocks.benefits.*.title' => ['required', 'string', 'max:255'],
             'blocks.benefits.*.description' => ['nullable', 'string', 'max:1000'],
             'blocks.detail' => ['nullable', 'string'],
+            'blocks.localContext' => ['nullable', 'string'],
+            'blocks.faqs' => ['nullable', 'array', 'max:12'],
+            'blocks.faqs.*' => ['array:id,question,answer'],
+            'blocks.faqs.*.id' => ['required', 'string', 'max:80', 'distinct'],
+            'blocks.faqs.*.question' => ['required', 'string', 'max:255'],
+            'blocks.faqs.*.answer' => ['required', 'string', 'max:2000'],
             'blocks.cta' => ['nullable', 'array:label,href'],
             'blocks.cta.label' => ['required_with:blocks.cta', 'string', 'max:80'],
             'blocks.cta.href' => ['required_with:blocks.cta', 'string', 'max:2048', new SafePublicUrl],

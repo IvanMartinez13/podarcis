@@ -22,7 +22,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $featured_image_alt
  * @property string|null $logo_image
  * @property string|null $logo_image_alt
- * @property array<int, mixed>|null $blocks
+ * @property array<string, mixed>|null $blocks
  * @property string|null $seo_title
  * @property string|null $seo_description
  * @property bool $is_featured

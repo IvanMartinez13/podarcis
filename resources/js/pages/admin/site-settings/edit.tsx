@@ -45,6 +45,14 @@ type SiteSettingsPayload = {
         email: string;
         phone: string;
         address: string;
+        legal_name: string;
+        street_address: string;
+        postal_code: string;
+        locality: string;
+        region: string;
+        country: string;
+        latitude: string;
+        longitude: string;
     };
     social_links: EditableLink[];
     footer_groups: FooterGroup[];
@@ -80,6 +88,14 @@ export default function EditSiteSettings({
             email: siteSettings.contact?.email ?? '',
             phone: siteSettings.contact?.phone ?? '',
             address: siteSettings.contact?.address ?? '',
+            legal_name: siteSettings.contact?.legal_name ?? '',
+            street_address: siteSettings.contact?.street_address ?? '',
+            postal_code: siteSettings.contact?.postal_code ?? '',
+            locality: siteSettings.contact?.locality ?? '',
+            region: siteSettings.contact?.region ?? '',
+            country: siteSettings.contact?.country ?? 'ES',
+            latitude: siteSettings.contact?.latitude ?? '',
+            longitude: siteSettings.contact?.longitude ?? '',
         },
         social_links: siteSettings.socialLinks.map(normalizeLink),
         footer_groups: siteSettings.footerGroups.map((group, index) => ({
@@ -165,6 +181,125 @@ export default function EditSiteSettings({
                             }
                         />
                     </FormField>
+                    <div className="grid gap-5 border-t border-slate-200 pt-5 lg:grid-cols-2">
+                        <FormField
+                            error={error('contact.legal_name')}
+                            label="Razón social"
+                        >
+                            <Input
+                                value={form.data.contact.legal_name}
+                                onChange={(event) =>
+                                    form.setData('contact', {
+                                        ...form.data.contact,
+                                        legal_name: event.target.value,
+                                    })
+                                }
+                            />
+                        </FormField>
+                        <FormField
+                            error={error('contact.street_address')}
+                            label="Calle y número"
+                        >
+                            <Input
+                                value={form.data.contact.street_address}
+                                onChange={(event) =>
+                                    form.setData('contact', {
+                                        ...form.data.contact,
+                                        street_address: event.target.value,
+                                    })
+                                }
+                            />
+                        </FormField>
+                        <FormField
+                            error={error('contact.postal_code')}
+                            label="Código postal"
+                        >
+                            <Input
+                                value={form.data.contact.postal_code}
+                                onChange={(event) =>
+                                    form.setData('contact', {
+                                        ...form.data.contact,
+                                        postal_code: event.target.value,
+                                    })
+                                }
+                            />
+                        </FormField>
+                        <FormField
+                            error={error('contact.locality')}
+                            label="Localidad"
+                        >
+                            <Input
+                                value={form.data.contact.locality}
+                                onChange={(event) =>
+                                    form.setData('contact', {
+                                        ...form.data.contact,
+                                        locality: event.target.value,
+                                    })
+                                }
+                            />
+                        </FormField>
+                        <FormField
+                            error={error('contact.region')}
+                            label="Comunidad / región"
+                        >
+                            <Input
+                                value={form.data.contact.region}
+                                onChange={(event) =>
+                                    form.setData('contact', {
+                                        ...form.data.contact,
+                                        region: event.target.value,
+                                    })
+                                }
+                            />
+                        </FormField>
+                        <FormField
+                            error={error('contact.country')}
+                            hint="Código ISO de dos letras, por ejemplo ES."
+                            label="País"
+                        >
+                            <Input
+                                maxLength={2}
+                                value={form.data.contact.country}
+                                onChange={(event) =>
+                                    form.setData('contact', {
+                                        ...form.data.contact,
+                                        country:
+                                            event.target.value.toUpperCase(),
+                                    })
+                                }
+                            />
+                        </FormField>
+                        <FormField
+                            error={error('contact.latitude')}
+                            label="Latitud"
+                        >
+                            <Input
+                                inputMode="decimal"
+                                value={form.data.contact.latitude}
+                                onChange={(event) =>
+                                    form.setData('contact', {
+                                        ...form.data.contact,
+                                        latitude: event.target.value,
+                                    })
+                                }
+                            />
+                        </FormField>
+                        <FormField
+                            error={error('contact.longitude')}
+                            label="Longitud"
+                        >
+                            <Input
+                                inputMode="decimal"
+                                value={form.data.contact.longitude}
+                                onChange={(event) =>
+                                    form.setData('contact', {
+                                        ...form.data.contact,
+                                        longitude: event.target.value,
+                                    })
+                                }
+                            />
+                        </FormField>
+                    </div>
                 </AdminFormSection>
 
                 <AdminFormSection
@@ -328,7 +463,9 @@ export default function EditSiteSettings({
                     ) : (
                         <Button
                             className="w-fit"
-                            onClick={() => form.setData('header_cta', blankCta())}
+                            onClick={() =>
+                                form.setData('header_cta', blankCta())
+                            }
                             type="button"
                             variant="outline"
                         >
@@ -539,7 +676,7 @@ function LinkCollection({
     );
 }
 
-function LinkRow({
+function LinkRow<TLink extends EditableLink | EditableCta>({
     errors,
     index,
     link,
@@ -549,8 +686,8 @@ function LinkRow({
 }: {
     errors: (path: string) => string | undefined;
     index: number;
-    link: EditableLink | EditableCta;
-    onChange: (link: EditableLink | EditableCta) => void;
+    link: TLink;
+    onChange: (link: TLink) => void;
     onRemove: () => void;
     path: string;
 }) {
@@ -562,7 +699,10 @@ function LinkRow({
                 <Input
                     value={link.label}
                     onChange={(event) =>
-                        onChange({ ...link, label: event.target.value })
+                        onChange({
+                            ...link,
+                            label: event.target.value,
+                        } as TLink)
                     }
                 />
             </FormField>
@@ -574,7 +714,7 @@ function LinkRow({
                 <Input
                     value={link.href}
                     onChange={(event) =>
-                        onChange({ ...link, href: event.target.value })
+                        onChange({ ...link, href: event.target.value } as TLink)
                     }
                 />
             </FormField>
@@ -612,10 +752,7 @@ function normalizeLink(link: {
     };
 }
 
-function normalizeCta(link: {
-    label: string;
-    href: string;
-}): EditableCta {
+function normalizeCta(link: { label: string; href: string }): EditableCta {
     return {
         label: link.label,
         href: link.href,

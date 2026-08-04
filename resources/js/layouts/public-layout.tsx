@@ -70,6 +70,7 @@ const fallbackSite: SiteSettings = {
             title: 'Recursos',
             links: [
                 { label: 'Blog', href: blog.index().url },
+                { label: 'Aviso legal', href: legal.notice().url },
                 {
                     label: 'Política de privacidad',
                     href: legal.privacy().url,

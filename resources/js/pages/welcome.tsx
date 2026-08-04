@@ -218,19 +218,15 @@ export default function Welcome({
                 }
                 description={homePage?.seoDescription ?? excerpt}
                 image={homePage?.ogImage}
-                canonical={
-                    typeof window !== 'undefined'
-                        ? new URL(home().url, window.location.origin).toString()
-                        : undefined
-                }
+                canonical={home().url}
                 jsonLd={{
-                    '@context': 'https://schema.org',
-                    '@type': 'Organization',
-                    name: 'PODARCIS',
-                    url:
-                        typeof window !== 'undefined'
-                            ? window.location.origin
-                            : undefined,
+                    '@type': 'WebPage',
+                    '@id': '/#webpage',
+                    url: '/',
+                    name: homePage?.seoTitle ?? title,
+                    isPartOf: { '@id': '/#website' },
+                    about: { '@id': '/#organization' },
+                    inLanguage: 'es-ES',
                 }}
             />
 

@@ -1,11 +1,8 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { Leaf } from 'lucide-react';
-import { createElement } from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
+import { ChartSpline, Leaf } from 'lucide-react';
 import {
     getServiceIcon,
-    loadServiceIcon,
     normalizeServiceIconName,
     resolveServiceIconName,
 } from '../../resources/js/lib/cms-icons.ts';
@@ -19,14 +16,7 @@ test('normalizes supported Lucide icon name formats', () => {
         normalizeServiceIconName('  refresh_ccw_dot  '),
         'refresh-ccw-dot',
     );
-    assert.equal(
-        resolveServiceIconName('MessageSquareWarning'),
-        'message-square-warning',
-    );
-    assert.equal(
-        resolveServiceIconName('message-circle-check'),
-        'message-circle',
-    );
+    assert.equal(resolveServiceIconName('ChartSpline'), 'chart-spline');
 });
 
 test('rejects unknown names while preserving the leaf fallback', () => {
@@ -36,25 +26,7 @@ test('rejects unknown names while preserving the leaf fallback', () => {
     assert.equal(getServiceIcon(''), Leaf);
 });
 
-test('loads dynamic Lucide forwardRef components', async () => {
-    for (const iconName of [
-        'footprints',
-        'refresh-ccw-dot',
-        'message-square-warning',
-    ] as const) {
-        const icon = await loadServiceIcon(iconName);
-        const forwardRefIcon = icon as unknown as {
-            $$typeof: symbol;
-            render: unknown;
-        };
-
-        assert.notEqual(icon, Leaf);
-        assert.equal(typeof icon, 'object');
-        assert.equal(typeof forwardRefIcon.$$typeof, 'symbol');
-        assert.equal(typeof forwardRefIcon.render, 'function');
-        assert.match(
-            renderToStaticMarkup(createElement(icon)),
-            new RegExp(`lucide-${iconName}`),
-        );
-    }
+test('resolves curated service icons without loading the full icon catalog', () => {
+    assert.equal(getServiceIcon('chart-spline'), ChartSpline);
+    assert.equal(resolveServiceIconName('footprints'), null);
 });

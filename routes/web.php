@@ -14,9 +14,12 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DigitalSolutionController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LegacyRedirectController;
 use App\Http\Controllers\LegalPageController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\SeoLandingPageController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SuccessCaseController;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +27,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/servicios', [ServiceController::class, 'index'])->name('services.index');
 Route::get('/servicios/{service:slug}', [ServiceController::class, 'show'])->name('services.show');
 Route::get('/soluciones-digitales', [DigitalSolutionController::class, 'index'])->name('digital-solutions.index');
+Route::get('/soluciones-digitales/{service:slug}', [DigitalSolutionController::class, 'show'])->name('digital-solutions.show');
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/{post:slug}', [BlogController::class, 'show'])->name('blog.show');
 Route::get('/casos-de-exito', [SuccessCaseController::class, 'index'])->name('success-cases.index');
@@ -31,8 +35,13 @@ Route::get('/casos-de-exito/{successCase:slug}', [SuccessCaseController::class, 
 Route::get('/quienes-somos', [PageController::class, 'about'])->name('pages.about');
 Route::get('/politica-de-privacidad', [LegalPageController::class, 'privacy'])->name('legal.privacy');
 Route::get('/politica-de-cookies', [LegalPageController::class, 'cookies'])->name('legal.cookies');
+Route::get('/aviso-legal', [LegalPageController::class, 'notice'])->name('legal.notice');
 Route::get('/contacto', [ContactController::class, 'index'])->name('contact.index');
 Route::post('/contacto', [ContactController::class, 'store'])->middleware('throttle:5,1')->name('contact.store');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+Route::get('/{path}', [SeoLandingPageController::class, 'show'])
+    ->where('path', 'servicios/.+')
+    ->name('seo-landings.show');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
@@ -54,3 +63,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+
+Route::match(['POST', 'PUT', 'PATCH', 'DELETE'], '/{unmatched}', fn () => abort(404))
+    ->where('unmatched', '.*');
+Route::fallback(LegacyRedirectController::class);

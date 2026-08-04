@@ -38,7 +38,7 @@ class UpdatePageRequest extends FormRequest
         }
 
         $this->merge([
-            'slug' => Str::slug($slug !== '' ? $slug : $title),
+            'slug' => $this->slugPath($slug !== '' ? $slug : $title),
             'excerpt' => CmsHtmlSanitizer::cleanNullable($this->input('excerpt')),
             'content' => CmsHtmlSanitizer::cleanNullable($this->input('content')),
             'seo_description' => CmsHtmlSanitizer::cleanNullable($this->input('seo_description')),
@@ -252,5 +252,13 @@ class UpdatePageRequest extends FormRequest
         );
 
         return $blocks;
+    }
+
+    private function slugPath(string $value): string
+    {
+        return collect(explode('/', trim($value, '/')))
+            ->map(fn (string $segment): string => Str::slug($segment))
+            ->filter()
+            ->implode('/');
     }
 }

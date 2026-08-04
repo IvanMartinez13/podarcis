@@ -7,6 +7,11 @@ use Inertia\Response;
 
 class LegalPageController extends Controller
 {
+    public function notice(): Response
+    {
+        return Inertia::render('legal/notice');
+    }
+
     public function privacy(): Response
     {
         return Inertia::render('legal/privacy');

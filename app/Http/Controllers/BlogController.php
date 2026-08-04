@@ -14,11 +14,18 @@ class BlogController extends Controller
 
     public function index(): Response
     {
+        $posts = Post::query()
+            ->published()
+            ->with('category')
+            ->latest('published_at')
+            ->paginate(12)
+            ->withQueryString();
+
         return Inertia::render('blog/index', [
             'page' => ($page = Page::query()->published()->where('slug', 'blog')->first())
                 ? $this->data->page($page)
                 : null,
-            'posts' => Post::query()->published()->with('category')->latest('published_at')->get()->map(fn (Post $post): array => $this->data->post($post)),
+            'posts' => $posts->through(fn (Post $post): array => $this->data->post($post)),
         ]);
     }
 

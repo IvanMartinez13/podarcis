@@ -11,7 +11,10 @@ use Illuminate\Support\Str;
 
 class PublicContentData
 {
-    public function __construct(private CmsImageStorage $images) {}
+    public function __construct(
+        private CmsImageStorage $images,
+        private PublicUrl $urls,
+    ) {}
 
     /**
      * @return array<string, mixed>
@@ -47,7 +50,7 @@ class PublicContentData
             'imageAlt' => $service->featured_image_alt,
             'logoImage' => $this->image($service->logo_image),
             'logoImageAlt' => $service->logo_image_alt,
-            'href' => route('services.show', $service),
+            'href' => $this->urls->for($service),
         ];
     }
 
@@ -63,7 +66,8 @@ class PublicContentData
             'featuredImage' => $this->image($post->featured_image),
             'imageAlt' => $post->featured_image_alt,
             'publishedAt' => $post->published_at?->toDateString(),
-            'href' => route('blog.show', $post),
+            'updatedAt' => $post->updated_at?->toDateString(),
+            'href' => $this->urls->for($post),
             'category' => $post->category ? [
                 'name' => $post->category->name,
                 'slug' => $post->category->slug,

@@ -8,5 +8,5 @@ test('the map icon does not shadow the native map constructor', function () {
     expect($source)
         ->toContain('Map as MapIcon')
         ->toContain('map: MapIcon')
-        ->toContain('new Map<string, LucideIcon>()');
+        ->not->toContain('lucide-react/dynamic');
 });

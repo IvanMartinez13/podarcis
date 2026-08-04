@@ -1,0 +1,125 @@
+origen;destino;accion;prioridad;nota
+/;/;mantener;critica;Home canonica
+/quienes-somos/;/quienes-somos;301;alta;Eliminar barra final de forma consistente
+/circularidad-y-economia-sostenible/;/servicios/planes-circularidad-hoteles;301_migrar;critica;Conservar contenido util y adaptar a hoteles de Baleares
+/calculo-huella-de-carbono/;/servicios/calculo-huella-carbono;301_migrar;critica;Servicio prioritario
+/visores-cartograficos/;/servicios/visores-cartograficos;301_migrar;alta;Ampliar contenido antes del lanzamiento
+/vigilancia-ambiental-de-obras/;/servicios/vigilancia-ambiental-de-obras;301_migrar;critica;Servicio prioritario
+/sonometria/;/servicios/sonometria;301_migrar;alta;Publicar solo si el servicio sigue activo [INFORMACIÓN NECESARIA]
+/sistemas-de-gestion/;/servicios/sistemas-de-gestion;301_migrar;critica;Pagina madre
+/sistema-de-gestion-de-calidad-iso-9001/;/servicios/sistemas-de-gestion/iso-9001;301_migrar;alta;Mantener intencion especifica
+/certificado-iso-14001-medio-ambiente/;/servicios/sistemas-de-gestion/iso-14001;301_migrar;alta;No afirmar que PODARCIS certifica
+/iso-45001-seguridad-y-salud/;/servicios/sistemas-de-gestion/iso-45001;301_migrar;alta;Mantener intencion especifica
+/iso-27001-seguridad-de-la-informacion/;/servicios/sistemas-de-gestion/iso-27001;301_migrar;alta;Mantener intencion especifica
+/red-natura-2000/;/servicios/estudios-ambientales/red-natura-2000;301_migrar;alta;Mantener intencion especifica
+/politica-de-gestion-empresarial/;/politica-de-gestion-empresarial;301_migrar;media;Documento de confianza no incluir si esta obsoleto
+/gracias/;/gracias;301_noindex;media;Mantener fuera del sitemap
+/norma-iso-50001-gestion-energetica/;/servicios/sistemas-de-gestion/iso-50001;301_migrar;alta;Mantener intencion especifica
+/gestion-de-incidencias-uuupsapp/;/soluciones-digitales/uuupsapp;301_migrar;alta;Separar producto de servicios
+/formacion-y-sensibilizacion-ambiental/;/servicios/formacion-medioambiental;301_migrar;alta;Consolidar sinonimos
+/evaluacion-de-impacto-ambiental-de-proyectos/;/servicios/estudios-ambientales/evaluacion-impacto-ambiental;301_migrar;critica;Pagina principal de EIA
+/evaluacion-ambiental-estrategica/;/servicios/estudios-ambientales/evaluacion-ambiental-estrategica;301_migrar;alta;Mantener intencion especifica
+/impacto-paisajistico/;/servicios/estudios-ambientales/impacto-paisajistico;301_migrar;alta;Mantener intencion especifica
+/estudio-impacto-ambiental/;/servicios/estudios-ambientales/evaluacion-impacto-ambiental;301_fusionar;critica;Fusionar duplicado con pagina EIA
+/sello-double-u-certificate/;/servicios/double-u-certificate;301_migrar;media;Validar naturaleza y criterios del reconocimiento
+/compliance-legislacion-online/;/soluciones-digitales/legislacion-online;301_migrar;alta;Pagina de producto
+/noticias/;/blog;301;critica;Archivo editorial
+/podarcis-se-adjudica-el-servicio-de-seguimiento-legal-en-seguridad-y-salud-en-el-trabajo-de-egarsat/;/blog/podarcis-se-adjudica-el-servicio-de-seguimiento-legal-en-seguridad-y-salud-en-el-trabajo-de-egarsat;301_migrar;alta;Verificar cliente y contrato
+/calculo-y-reduccion-de-la-huella-de-carbono-en-mas-de-490-centros-de-trabajo-en-2022/;/blog/calculo-y-reduccion-de-la-huella-de-carbono-en-mas-de-490-centros-de-trabajo-en-2022;301_migrar;alta;Verificar cifra y actualizar contexto
+/podarcis-vigila-ambientalmente-las-obras-de-la-carretera-ma-6100/;/blog/podarcis-vigila-ambientalmente-las-obras-de-la-carretera-ma-6100;301_migrar;alta;Candidato a caso de exito relacionado
+/emt-de-madrid-contrata-legislaciononline-es-para-actualizar-la-normativa-ambiental-de-aplicacion/;/blog/emt-de-madrid-contrata-legislaciononline-es-para-actualizar-la-normativa-ambiental-de-aplicacion;301_migrar;media;Verificar autorizacion de marca
+/la-junta-de-andalucia-confia-en-podarcis/;/blog/la-junta-de-andalucia-confia-en-podarcis;301_migrar;media;Verificar alcance y adjudicacion
+/metromadrid-huelladecarbono/;/blog/metromadrid-huelladecarbono;301_migrar;alta;Verificar proyecto y enlazar a huella
+/rd214_2015-huella-de-carbono/;/blog/rd214_2015-huella-de-carbono;301_migrar_actualizar;alta;Revisar numero de norma fecha y vigencia
+/podarcis-adjudicatario-del-servicio-de-cumplimiento-legal-en-seguridad-y-salud-laboral-del-port-de-barcelona/;/blog/podarcis-adjudicatario-del-servicio-de-cumplimiento-legal-en-seguridad-y-salud-laboral-del-port-de-barcelona;301_migrar;media;Verificar contrato
+/adif-alta-velocidad-adjudica-a-podarcis-la-gestion-y-actualizacion-de-sus-requisitos-ambientales-hasta-2031/;/blog/adif-alta-velocidad-adjudica-a-podarcis-la-gestion-y-actualizacion-de-sus-requisitos-ambientales-hasta-2031;301_migrar;alta;Contenido reciente de autoridad
+/hola-mundo/;;410;baja;Contenido de prueba sin equivalente
+/actualizamos-nuestra-plataforma-de-identificacion-y-actualizacion-de-requisitos-legales/;/blog/actualizamos-nuestra-plataforma-de-identificacion-y-actualizacion-de-requisitos-legales;301_migrar_actualizar;media;Actualizar producto y capturas
+/colonya-caixa-pollenca-confia-su-estrategia-de-descarbonizacion-a-podarcis/;/blog/colonya-caixa-pollenca-confia-su-estrategia-de-descarbonizacion-a-podarcis;301_migrar;alta;Experiencia local verificar autorizacion
+/renault-consigue-reducir-un-85-su-huella-de-carbono-gracias-al-asesoramiento-de-podarcis/;/blog/renault-consigue-reducir-un-85-su-huella-de-carbono-gracias-al-asesoramiento-de-podarcis;301_migrar;alta;Verificar cliente metodologia y cifra
+/ferrocarrils-de-la-generalitat-valenciana-adjudica-a-podarcis-la-evaluacion-del-cumplimiento-legal/;/blog/ferrocarrils-de-la-generalitat-valenciana-adjudica-a-podarcis-la-evaluacion-del-cumplimiento-legal;301_migrar;media;Verificar adjudicacion
+/aguas-de-valladolid-adjudica-a-podarcis-el-calculo-de-su-huella-de-carbono-2020-2022/;/blog/aguas-de-valladolid-adjudica-a-podarcis-el-calculo-de-su-huella-de-carbono-2020-2022;301_migrar;media;Verificar adjudicacion
+/podarcis-se-adjudica-el-servicio-web-de-gestion-y-actualizacion-de-legislacion-tecnica-de-adif/;/blog/podarcis-se-adjudica-el-servicio-web-de-gestion-y-actualizacion-de-legislacion-tecnica-de-adif;301_migrar;media;Verificar adjudicacion
+/el-ibsalut-encarga-a-podarcis-el-calculo-de-la-huella-de-carbono-de-toda-su-entidad/;/blog/el-ibsalut-encarga-a-podarcis-el-calculo-de-la-huella-de-carbono-de-toda-su-entidad;301_migrar;alta;Experiencia local verificar alcance
+/economia-circular-hoteles-baleares/;/blog/economia-circular-hoteles-baleares;301_migrar_actualizar;alta;Actualizar normativa y enlazar circularidad
+/gestion-empresarial/;/blog/gestion-empresarial;301_migrar_revisar;media;Confirmar que el tema sigue dentro del posicionamiento
+/laboratorio/;/blog/laboratorio;301_migrar_revisar;baja;Confirmar servicio o contexto historico
+/oficina-tecnica/;/blog/oficina-tecnica;301_migrar_revisar;baja;Confirmar servicio o contexto historico
+/servicios-educativos-y-participacion-publica/;/blog/servicios-educativos-y-participacion-publica;301_migrar_revisar;media;Relacionar con formacion si sigue activo
+/el-pla-especial-del-cami-de-cavalls-de-menorca-se-somete-a-evaluacion-ambiental/;/blog/el-pla-especial-del-cami-de-cavalls-de-menorca-se-somete-a-evaluacion-ambiental;301_migrar_actualizar;media;Revisar estado del procedimiento
+/podarcis-recibe-el-sello-de-pyme-innovadora-por-parte-del-ministerio-de-ciencia-e-innovacion/;/blog/podarcis-recibe-el-sello-de-pyme-innovadora-por-parte-del-ministerio-de-ciencia-e-innovacion;301_migrar;alta;Verificar vigencia del sello
+/podarcis-crea-el-departamento-desarrollo-de-software-y-amplia-la-oferta-de-servicios/;/blog/podarcis-crea-el-departamento-desarrollo-de-software-y-amplia-la-oferta-de-servicios;301_migrar;media;Historia corporativa
+/union-de-mutuas-confia-su-evaluacion-de-requisitos-legales-a-podarcis/;/blog/union-de-mutuas-confia-su-evaluacion-de-requisitos-legales-a-podarcis;301_migrar;media;Verificar cliente
+/podarcis-calculara-la-huella-de-carbono-de-la-autoritat-portuaria-de-balears-apb/;/blog/podarcis-calculara-la-huella-de-carbono-de-la-autoritat-portuaria-de-balears-apb;301_migrar;alta;Experiencia local verificar proyecto
+/mutua-balear-selecciona-a-podarcis-para-realizar-las-auditorias-internas-iso/;/blog/mutua-balear-selecciona-a-podarcis-para-realizar-las-auditorias-internas-iso;301_migrar;alta;Experiencia local verificar proyecto
+/podarcis-lider-en-baleares-en-la-evaluacion-de-impacto-ambiental-de-parques-fotovoltaicos/;/blog/podarcis-lider-en-baleares-en-la-evaluacion-de-impacto-ambiental-de-parques-fotovoltaicos;301_migrar_revisar;alta;Sustentar o retirar la afirmacion lider
+/podarcis-adquiere-los-derechos-de-explotacion-deportiva-del-g-run-diana-athletic-club-por-12-millones-de-e/;;410;baja;Contenido ajeno o no verificable no redirigir a la home
+/la-gestion-de-las-incidencias-de-parques-y-jardines-de-barcelona-se-realizara-con-uuupsapp/;/blog/la-gestion-de-las-incidencias-de-parques-y-jardines-de-barcelona-se-realizara-con-uuupsapp;301_migrar;alta;Candidato a caso de producto
+/podarcis-desarrolla-el-primer-software-online-para-el-calculo-y-registro-de-la-huella-de-carbono/;/blog/podarcis-desarrolla-el-primer-software-online-para-el-calculo-y-registro-de-la-huella-de-carbono;301_migrar_revisar;media;Sustentar o retirar la afirmacion primero
+/podarcis-se-expande-a-mexico-estableciendo-nuevas-alianzas-estrategicas/;/blog/podarcis-se-expande-a-mexico-estableciendo-nuevas-alianzas-estrategicas;301_migrar_revisar;baja;Confirmar que la expansion sigue vigente
+/fotografia-y-video-de-naturaleza-con-drones-aspectos-reglamentarios/;/blog/fotografia-y-video-de-naturaleza-con-drones-aspectos-reglamentarios;301_migrar_actualizar;media;Revisar normativa de drones
+/drones-y-seguimiento-ambiental-de-obras/;/blog/drones-y-seguimiento-ambiental-de-obras;301_migrar_actualizar;alta;Enlazar a vigilancia y revisar operativa actual
+/podarcis-presenta-en-el-congreso-civildron19-su-proyecto-posidronia/;/blog/podarcis-presenta-en-el-congreso-civildron19-su-proyecto-posidronia;301_migrar;media;Contenido historico verificable
+/compliance-fundacio-atencio-suport-dependencia-legislaciononline/;/blog/compliance-fundacio-atencio-suport-dependencia-legislaciononline;301_migrar;media;Verificar cliente
+/auditoria-acustica-de-la-planta-de-transferencia-de-residuos-de-formentera/;/blog/auditoria-acustica-de-la-planta-de-transferencia-de-residuos-de-formentera;301_migrar;alta;Experiencia local y sonometria
+/sirenis-hotels-reafirma-su-compromiso-de-calidad-y-respeto-por-el-medio-ambiente/;/blog/sirenis-hotels-reafirma-su-compromiso-de-calidad-y-respeto-por-el-medio-ambiente;301_migrar;alta;Verificar autorizacion de cliente
+/seguimiento-ambiental-de-las-obras-de-la-fase-ii-de-la-planta-de-metanizacion-de-mallorca/;/blog/seguimiento-ambiental-de-las-obras-de-la-fase-ii-de-la-planta-de-metanizacion-de-mallorca;301_migrar;alta;Experiencia local candidata a caso
+/podarcis-s-l-imparte-el-curso-de-inspector-sonometrico-para-la-policia-local/;/blog/podarcis-s-l-imparte-el-curso-de-inspector-sonometrico-para-la-policia-local;301_migrar;media;Verificar curso y organismo
+/podarcis-nueva-empresa-operadora-de-drones-de-baleares/;/blog/podarcis-nueva-empresa-operadora-de-drones-de-baleares;301_migrar_revisar;media;Confirmar habilitacion y vigencia
+/real-decreto-5132017-por-el-que-se-aprueba-el-reglamento-de-instalaciones-de-proteccion-contra-incendios/;/blog/real-decreto-5132017-por-el-que-se-aprueba-el-reglamento-de-instalaciones-de-proteccion-contra-incendios;301_migrar_actualizar;media;Contenido legal sujeto a revision
+/hotel-llaut-palace-apuesta-por-la-sostenibilidad-ambiental/;/blog/hotel-llaut-palace-apuesta-por-la-sostenibilidad-ambiental;301_migrar;alta;Experiencia hotelera local verificar autorizacion
+/el-tribunal-constitucional-suspende-3-articulos-de-la-ley-122016-de-evaluacion-ambiental-de-las-illes-balears/;/blog/el-tribunal-constitucional-suspende-3-articulos-de-la-ley-122016-de-evaluacion-ambiental-de-las-illes-balears;301_migrar_actualizar;alta;Explicar estado actual de la norma
+/podarcis-s-l-auditara-el-sistema-de-gestion-une-158101-de-la-fundacion-de-atencion-y-soporte-a-la-dependencia-y-promocion-de-la-autonomia-personal-de-las-illes-balears/;/blog/podarcis-s-l-auditara-el-sistema-de-gestion-une-158101-de-la-fundacion-de-atencion-y-soporte-a-la-dependencia-y-promocion-de-la-autonomia-personal-de-las-illes-balears;301_migrar;media;Verificar proyecto
+/luz-verde-para-la-vuelta-a-ibiza-en-mountain-bike/;/blog/luz-verde-para-la-vuelta-a-ibiza-en-mountain-bike;301_migrar_actualizar;media;Explicar contexto ambiental e historico
+/podarcis-s-l-colabora-con-el-producto-social-3-glops/;/blog/podarcis-s-l-colabora-con-el-producto-social-3-glops;301_migrar_revisar;baja;Confirmar relevancia y vigencia
+/posidronia-sistemas-aereos-de-control-remoto-y-conservacion-de-las-praderas-de-posidonia-oceanica/;/blog/posidronia-sistemas-aereos-de-control-remoto-y-conservacion-de-las-praderas-de-posidonia-oceanica;301_migrar;alta;Contenido local especializado
+/real-decreto-legislativo-12016-de-16-de-diciembre-por-el-que-se-aprueba-el-texto-refundido-de-la-ley-de-prevencion-y-control-integrados-de-la-contaminacion/;/blog/real-decreto-legislativo-12016-de-16-de-diciembre-por-el-que-se-aprueba-el-texto-refundido-de-la-ley-de-prevencion-y-control-integrados-de-la-contaminacion;301_migrar_actualizar;media;Revisar titulo fecha y vigencia
+/la-tecnica-constructiva-de-la-pedra-en-sec-en-la-isla-de-ibiza-mas-cerca-de-ser-patrimonio-inmaterial-de-la-unesco/;/blog/la-tecnica-constructiva-de-la-pedra-en-sec-en-la-isla-de-ibiza-mas-cerca-de-ser-patrimonio-inmaterial-de-la-unesco;301_migrar_actualizar;media;Actualizar desenlace y relevancia ambiental
+/10aniversario/;/blog/10aniversario;301_migrar;media;Historia corporativa
+/una-informadora-ambiental-de-podarcis-concienciara-a-comerciantes-y-ciudadanos-de-formentera-sobre-la-correcta-gestion-de-residuos-urbanos/;/blog/una-informadora-ambiental-de-podarcis-concienciara-a-comerciantes-y-ciudadanos-de-formentera-sobre-la-correcta-gestion-de-residuos-urbanos;301_migrar;media;Experiencia local
+/nuevo-real-decreto-562016-sobre-auditorias-energeticas/;/blog/nuevo-real-decreto-562016-sobre-auditorias-energeticas;301_migrar_actualizar;media;Revisar vigencia y cambios
+/rednatura2000/;/blog/rednatura2000;301_migrar_actualizar;media;Enlazar a servicio Red Natura 2000
+/publicada-la-nueva-iso-140012015/;/blog/publicada-la-nueva-iso-140012015;301_migrar_actualizar;alta;Actualizar revision de la norma si procede
+/gestiondeincidencias_uuupsapp/;/blog/gestiondeincidencias-uuupsapp;301_migrar_actualizar;media;Normalizar guion bajo y enlazar producto
+/gestion_compliance/;/blog/gestion-compliance;301_migrar_actualizar;media;Normalizar guion bajo y revisar terminologia
+/gestion-de-los-riesgos-biologicos-en-el-ambito-laboral/;/blog/gestion-de-los-riesgos-biologicos-en-el-ambito-laboral;301_migrar_actualizar;baja;Revisar encaje con oferta actual
+/modificado-el-rd-1062008-sobre-pilas-y-acumuladores/;/blog/modificado-el-rd-1062008-sobre-pilas-y-acumuladores;301_migrar_actualizar;media;Contenido legal sujeto a revision
+/podarcis-s-l-certifica-la-excelente-calidad-acustica-del-hotel-es-moli/;/blog/podarcis-s-l-certifica-la-excelente-calidad-acustica-del-hotel-es-moli;301_migrar_revisar;media;Aclarar alcance de certifica y autorizacion del cliente
+/legislacion-online-proyecto-de-orden-ministerial-sobre-valorizacion-de-materiales-naturales-excavados/;/blog/legislacion-online-proyecto-de-orden-ministerial-sobre-valorizacion-de-materiales-naturales-excavados;301_migrar_actualizar;media;Indicar resultado final del proyecto normativo
+/nuevas-oportunidades-a-los-parques-fotovoltaicos-en-las-islas-baleares/;/blog/nuevas-oportunidades-a-los-parques-fotovoltaicos-en-las-islas-baleares;301_migrar_actualizar;alta;Actualizar marco balear
+/futuras-modificaciones-en-la-ley-262007-de-responsabilidad-medioambiental/;/blog/futuras-modificaciones-en-la-ley-262007-de-responsabilidad-medioambiental;301_migrar_actualizar;media;Indicar normativa vigente
+/arias-canete-defiende-que-el-proyecto-de-ley-de-responsabilidad-ambiental-mantiene-con-todo-rigor-los-principios-de-prevencion-y-de-que-quien-contamina-paga/;/blog/arias-canete-defiende-que-el-proyecto-de-ley-de-responsabilidad-ambiental-mantiene-con-todo-rigor-los-principios-de-prevencion-y-de-que-quien-contamina-paga;301_migrar_actualizar;baja;Reenfocar como historico o retirar si no aporta
+/el-ministerio-de-agricultura-alimentacion-y-medio-ambiente-abre-a-consulta-publica-la-propuesta-de-cinco-nuevos-lic-marinos/;/blog/el-ministerio-de-agricultura-alimentacion-y-medio-ambiente-abre-a-consulta-publica-la-propuesta-de-cinco-nuevos-lic-marinos;301_migrar_actualizar;media;Actualizar resultado de consulta
+/legislacion-online-aprobada-la-modificacion-de-la-ley-de-responsabilidad-ambiental-para-prevenir-y-reparar-los-danos-ambientales/;/blog/legislacion-online-aprobada-la-modificacion-de-la-ley-de-responsabilidad-ambiental-para-prevenir-y-reparar-los-danos-ambientales;301_migrar_actualizar;media;Revisar vigencia
+/legislacion-online-proyecto-de-real-decreto-por-el-que-se-regulan-las-emisiones-de-contaminantes-procedentes-de-los-motores-de-los-vehiculos-que-circulan-por-la-via-publica/;/blog/legislacion-online-proyecto-de-real-decreto-por-el-que-se-regulan-las-emisiones-de-contaminantes-procedentes-de-los-motores-de-los-vehiculos-que-circulan-por-la-via-publica;301_migrar_actualizar;baja;Indicar norma finalmente aprobada
+/legislacion-online-proyecto-de-real-decreto-que-regula-el-movimiento-mediante-sistema-informatico-de-los-sandach/;/blog/legislacion-online-proyecto-de-real-decreto-que-regula-el-movimiento-mediante-sistema-informatico-de-los-sandach;301_migrar_actualizar;baja;Indicar norma finalmente aprobada
+/plansectorialturismonaturaleza/;/blog/plan-sectorial-turismo-naturaleza;301_migrar_actualizar;media;Normalizar slug y actualizar plan
+/nueva-itc-sobre-baja-tension-bt-40-instalaciones-generadoras-de-baja-tension/;/blog/nueva-itc-sobre-baja-tension-bt-40-instalaciones-generadoras-de-baja-tension;301_migrar_actualizar;baja;Revisar encaje con oferta actual
+/proyecto-de-real-decreto-por-el-que-se-crea-el-registro-unico-del-sistema-voluntario-de-calculo-de-la-huella-de-carbono-su-reduccion-y-compensacion-por-absorciones-de-dioxido-de-carbono/;/blog/proyecto-de-real-decreto-por-el-que-se-crea-el-registro-unico-del-sistema-voluntario-de-calculo-de-la-huella-de-carbono-su-reduccion-y-compensacion-por-absorciones-de-dioxido-de-carbono;301_migrar_actualizar;alta;Actualizar al registro estatal vigente
+/podarcis-s-l-colabora-en-la-difusion-de-la-red-natura-2000/;/blog/podarcis-s-l-colabora-en-la-difusion-de-la-red-natura-2000;301_migrar;media;Enlazar servicio relacionado
+/tecnicos-de-podarcis-s-l-auditan-segun-une-iso-50-001-la-catedral-de-mallorca/;/blog/tecnicos-de-podarcis-s-l-auditan-segun-une-iso-50-001-la-catedral-de-mallorca;301_migrar_revisar;alta;Corregir denominacion ISO y verificar autorizacion
+/accionco/;/blog/accionco;301_migrar_revisar;baja;Titulo opaco revisar utilidad y contexto
+/dia-de-la-tierra-2012/;/blog/dia-de-la-tierra-2012;301_migrar_revisar;baja;Contenido historico de baja intencion
+/nueva-norma-une-iso-500012011/;/blog/nueva-norma-une-iso-500012011;301_migrar_actualizar;media;Actualizar norma ISO 50001
+/la-fundacio-balears-sostenible-asesorada-por-podarcis-se-certifica-en-iso-14001/;/blog/la-fundacio-balears-sostenible-asesorada-por-podarcis-se-certifica-en-iso-14001;301_migrar;media;Verificar cliente y autorizacion
+/brunet-aguilar-asesores-confia-en-podarcis-s-l-para-la-implantacion-de-un-sistema-integrado-de-gestion/;/blog/brunet-aguilar-asesores-confia-en-podarcis-s-l-para-la-implantacion-de-un-sistema-integrado-de-gestion;301_migrar;media;Verificar cliente
+/saasdelaseman/;/blog/saas-de-la-semana;301_migrar_revisar;baja;Normalizar slug y verificar relevancia
+/fira2011eiviss/;/blog/fira-2011-eivissa;301_migrar_revisar;baja;Normalizar slug y aportar contexto
+/podarcis-s-l-evalua-ambientalmente-el-planeamiento-urbanistico-de-bunyola-mallorca/;/blog/podarcis-s-l-evalua-ambientalmente-el-planeamiento-urbanistico-de-bunyola-mallorca;301_migrar;alta;Experiencia local candidata a caso
+/nuevo-programa-formativo-2011/;/blog/nuevo-programa-formativo-2011;301_migrar_revisar;baja;Confirmar utilidad historica
+/fundacion-hospital-de-manacor-contrata-los-servicios-de-consultoria-a-podarcis-s-l/;/blog/fundacion-hospital-de-manacor-contrata-los-servicios-de-consultoria-a-podarcis-s-l;301_migrar;alta;Experiencia local verificar autorizacion
+/legislaciononline-es/;/blog/legislacion-online;301_migrar_actualizar;media;Normalizar marca y enlazar producto
+/saica-natur-contrata-los-servicios-de-inspeccion-sonometrica-a-podarcis-s-l/;/blog/saica-natur-contrata-los-servicios-de-inspeccion-sonometrica-a-podarcis-s-l;301_migrar;media;Verificar cliente
+/tecnicos-de-podarcis-s-l-participan-en-el-master-en-sistemas-integrados-de-gestion-titulo-propio-de-la-uib/;/blog/tecnicos-de-podarcis-s-l-participan-en-el-master-en-sistemas-integrados-de-gestion-titulo-propio-de-la-uib;301_migrar;media;Autoridad local verificar participacion
+/grupotel-gran-vista-spa-contrata-los-servicios-de-inspeccion-sonometrica-de-podarcis-s-l-para-la-determinacion-de-ruido-ambiental/;/blog/grupotel-gran-vista-spa-contrata-los-servicios-de-inspeccion-sonometrica-de-podarcis-s-l-para-la-determinacion-de-ruido-ambiental;301_migrar;alta;Experiencia hotelera local verificar autorizacion
+/comprometidos-con-el-medio-ambiente-podarcis-s-l-obtiene-la-certificacion-iso-140012004/;/blog/comprometidos-con-el-medio-ambiente-podarcis-s-l-obtiene-la-certificacion-iso-140012004;301_migrar_actualizar;alta;Verificar certificado y norma vigente
+/politica-privacidad/;/politica-de-privacidad;301;critica;URL legal enlazada en web antigua
+/politica-de-cookies-ue/;/politica-de-cookies;301;critica;URL legal enlazada en web antigua
+/aviso-legal/;/aviso-legal;301_migrar;critica;Crear pagina antes del lanzamiento
+/feed/;;410_o_404;baja;No migrar feed WordPress salvo necesidad editorial
+/comments/feed/;;410_o_404;baja;No migrar feed de comentarios
+/wp-admin/;;404_protegido;critica;No redirigir a admin Laravel
+/wp-login.php;;404_protegido;critica;No exponer superficie de autenticacion nueva
+/wp-json/;;404;media;API WordPress retirada
+/xmlrpc.php;;404;alta;Endpoint WordPress retirado
+/*/page/{n}/;/blog?page={n};301_patron;alta;Validar cada pagina historica existente

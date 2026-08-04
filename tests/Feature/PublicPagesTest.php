@@ -84,8 +84,8 @@ test('blog index and show expose only published posts', function () {
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->component('blog/index')
-            ->has('posts', 1)
-            ->where('posts.0.title', 'Post publicado'));
+            ->has('posts.data', 1)
+            ->where('posts.data.0.title', 'Post publicado'));
 
     $this->get(route('blog.show', $published))->assertOk();
     $this->get(route('blog.show', $draft))->assertNotFound();

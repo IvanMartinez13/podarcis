@@ -1,7 +1,8 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { createElement } from 'react';
 
+import { Breadcrumbs, breadcrumbSchema } from '@/components/public/breadcrumbs';
 import { CaseStudyCard } from '@/components/public/case-study-card';
 import { Container } from '@/components/public/container';
 import { CTASection } from '@/components/public/cta-section';
@@ -13,8 +14,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getServiceIcon } from '@/lib/cms-icons';
 import * as contact from '@/routes/contact';
+import * as digitalSolutions from '@/routes/digital-solutions';
 import * as servicesRoutes from '@/routes/services';
-import type { CmsService, CmsSuccessCase } from '@/types';
+import type { CmsService, CmsSuccessCase, SharedPageProps } from '@/types';
 
 type ServiceShowProps = {
     service: CmsService;
@@ -26,6 +28,24 @@ export default function ServiceShow({
     successCases,
 }: ServiceShowProps) {
     const benefits = service.blocks?.benefits ?? [];
+    const { seo } = usePage<SharedPageProps>().props;
+    const faqs =
+        service.blocks?.faqs?.filter((faq) => faq.question && faq.answer) ?? [];
+    const indexRoute =
+        service.kind === 'digital'
+            ? digitalSolutions.index()
+            : servicesRoutes.index();
+    const breadcrumbs = [
+        { label: 'Inicio', href: '/' },
+        {
+            label:
+                service.kind === 'digital'
+                    ? 'Soluciones digitales'
+                    : 'Servicios',
+            href: indexRoute.url,
+        },
+        { label: service.title, href: service.href },
+    ];
 
     return (
         <>
@@ -33,16 +53,31 @@ export default function ServiceShow({
                 title={service.seoTitle ?? service.title}
                 description={service.seoDescription ?? service.excerpt}
                 image={service.featuredImage}
-                jsonLd={{
-                    '@context': 'https://schema.org',
-                    '@type': 'Service',
-                    name: service.title,
-                    description: service.seoDescription ?? service.excerpt,
-                    provider: {
-                        '@type': 'Organization',
-                        name: 'PODARCIS',
+                jsonLd={[
+                    {
+                        '@type': 'Service',
+                        name: service.title,
+                        description: service.seoDescription ?? service.excerpt,
+                        provider: { '@id': `${seo.baseUrl}/#organization` },
+                        areaServed: ['Mallorca', 'Illes Balears'],
                     },
-                }}
+                    breadcrumbSchema(breadcrumbs),
+                    ...(faqs.length > 0
+                        ? [
+                              {
+                                  '@type': 'FAQPage',
+                                  mainEntity: faqs.map((faq) => ({
+                                      '@type': 'Question',
+                                      name: faq.question,
+                                      acceptedAnswer: {
+                                          '@type': 'Answer',
+                                          text: faq.answer,
+                                      },
+                                  })),
+                              },
+                          ]
+                        : []),
+                ]}
             />
 
             <PublicHero as="header" backgroundImage={service.featuredImage}>
@@ -100,14 +135,17 @@ export default function ServiceShow({
                                 variant="outline"
                                 className="border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white"
                             >
-                                <Link href={servicesRoutes.index()}>
-                                    Ver todos los servicios
+                                <Link href={indexRoute}>
+                                    {service.kind === 'digital'
+                                        ? 'Ver todas las soluciones'
+                                        : 'Ver todos los servicios'}
                                 </Link>
                             </Button>
                         </div>
                     </div>
                 </Container>
             </PublicHero>
+            <Breadcrumbs items={breadcrumbs} />
 
             <Section
                 eyebrow="En detalle"
@@ -152,6 +190,39 @@ export default function ServiceShow({
                     />
                 </div>
             </Section>
+
+            {service.blocks?.localContext && (
+                <Section
+                    surface="muted"
+                    eyebrow="Mallorca y Baleares"
+                    title="Experiencia aplicada al contexto local"
+                >
+                    <RichText
+                        className="mx-auto max-w-4xl text-lg leading-8 text-podarcis-muted"
+                        html={service.blocks.localContext}
+                    />
+                </Section>
+            )}
+
+            {faqs.length > 0 && (
+                <Section
+                    eyebrow="Preguntas frecuentes"
+                    title="Dudas habituales sobre el servicio"
+                >
+                    <div className="mx-auto max-w-4xl divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white px-6">
+                        {faqs.map((faq) => (
+                            <details className="group py-5" key={faq.id}>
+                                <summary className="cursor-pointer list-none pr-8 font-semibold text-podarcis-navy">
+                                    {faq.question}
+                                </summary>
+                                <p className="mt-3 leading-7 text-podarcis-muted">
+                                    {faq.answer}
+                                </p>
+                            </details>
+                        ))}
+                    </div>
+                </Section>
+            )}
 
             {successCases.length > 0 && (
                 <Section

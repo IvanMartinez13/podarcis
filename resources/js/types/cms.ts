@@ -97,6 +97,12 @@ export type ServiceBlocks = {
         description?: string | null;
     }>;
     cta?: CmsLink | null;
+    localContext?: string | null;
+    faqs?: Array<{
+        id: string;
+        question: string;
+        answer: string;
+    }>;
 };
 
 export type PageBlocks =
@@ -137,6 +143,7 @@ export type CmsPost = {
     featuredImage: string | null;
     imageAlt?: string | null;
     publishedAt: string | null;
+    updatedAt?: string | null;
     href: string;
     category: CmsCategory | null;
     author?: { name: string } | null;
@@ -188,6 +195,14 @@ export type SiteSettings = {
         email?: string | null;
         phone?: string | null;
         address?: string | null;
+        legal_name?: string | null;
+        street_address?: string | null;
+        postal_code?: string | null;
+        locality?: string | null;
+        region?: string | null;
+        country?: string | null;
+        latitude?: string | null;
+        longitude?: string | null;
     } | null;
     socialLinks: CmsLink[];
     footerGroups: Array<{

@@ -8,10 +8,15 @@ import AuthLayout from '@/layouts/auth-layout';
 import PublicLayout from '@/layouts/public-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'PODARCIS';
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    title: (title) =>
+        title
+            ? title.toLocaleUpperCase('es').includes('PODARCIS')
+                ? title
+                : `${title} · ${appName}`
+            : appName,
     layout: (name) => {
         switch (true) {
             case name === 'welcome':
@@ -22,6 +27,7 @@ createInertiaApp({
             case name.startsWith('pages/'):
             case name.startsWith('contact/'):
             case name.startsWith('legal/'):
+            case name.startsWith('errors/'):
                 return PublicLayout;
             case name.startsWith('auth/'):
                 return AuthLayout;
@@ -48,4 +54,6 @@ createInertiaApp({
 });
 
 // This will set light / dark mode on load...
-initializeTheme();
+if (typeof window !== 'undefined') {
+    initializeTheme();
+}

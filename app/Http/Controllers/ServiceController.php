@@ -30,7 +30,7 @@ class ServiceController extends Controller
 
     public function show(Service $service): Response
     {
-        abort_unless($this->isPublished($service), 404);
+        abort_unless($service->kind === 'consulting' && $this->isPublished($service), 404);
 
         $service->load(['successCases' => fn ($query) => $query->published()->with('service')->latest('published_at')->limit(3)]);
 

@@ -41,4 +41,25 @@ class DigitalSolutionController extends Controller
                 ->map(fn (Service $service): array => $this->data->service($service)),
         ]);
     }
+
+    public function show(Service $service): Response
+    {
+        abort_unless($service->kind === 'digital' && $this->isPublished($service), 404);
+
+        return Inertia::render('services/show', [
+            'service' => [
+                ...$this->data->service($service),
+                'description' => $service->description,
+                'blocks' => $service->blocks,
+                'seoTitle' => $service->seo_title,
+                'seoDescription' => $service->seo_description,
+            ],
+            'successCases' => [],
+        ]);
+    }
+
+    private function isPublished(Service $service): bool
+    {
+        return $service->status === 'published' && ($service->published_at === null || $service->published_at->isPast());
+    }
 }

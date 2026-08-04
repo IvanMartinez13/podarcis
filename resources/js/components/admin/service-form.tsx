@@ -1,5 +1,5 @@
 import { Link, useForm } from '@inertiajs/react';
-import { CircleHelp } from 'lucide-react';
+import { CircleHelp, Plus, Trash2 } from 'lucide-react';
 import { createElement } from 'react';
 import type { FormEvent } from 'react';
 import { AdminFormSection } from '@/components/admin/admin-form-section';
@@ -189,6 +189,19 @@ export function ServiceForm({ service, mode }: ServiceFormProps) {
                     value={form.data.excerpt}
                     onChange={(nextValue) => form.setData('excerpt', nextValue)}
                 />
+                <SummernoteField
+                    error={nestedError('blocks.localContext')}
+                    id="blocks_local_context"
+                    label="Contexto local de Mallorca y Baleares"
+                    height={190}
+                    value={form.data.blocks?.localContext ?? ''}
+                    onChange={(nextValue) =>
+                        form.setData('blocks', {
+                            ...form.data.blocks,
+                            localContext: nextValue,
+                        })
+                    }
+                />
 
                 <SummernoteField
                     error={form.errors.description}
@@ -255,6 +268,119 @@ export function ServiceForm({ service, mode }: ServiceFormProps) {
                             }
                         />
                     </FormField>
+                </div>
+
+                <div className="grid gap-4 border-t border-slate-200 pt-5">
+                    <div className="flex items-center justify-between gap-4">
+                        <div>
+                            <h3 className="font-semibold text-slate-900 dark:text-white">
+                                Preguntas frecuentes
+                            </h3>
+                            <p className="text-sm text-slate-500">
+                                Solo se genera FAQPage cuando estas preguntas
+                                también son visibles.
+                            </p>
+                        </div>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() =>
+                                form.setData('blocks', {
+                                    ...form.data.blocks,
+                                    faqs: [
+                                        ...(form.data.blocks?.faqs ?? []),
+                                        {
+                                            id: crypto.randomUUID(),
+                                            question: '',
+                                            answer: '',
+                                        },
+                                    ],
+                                })
+                            }
+                        >
+                            <Plus className="size-4" /> Añadir pregunta
+                        </Button>
+                    </div>
+                    {(form.data.blocks?.faqs ?? []).map((faq, index) => (
+                        <div
+                            className="grid gap-3 rounded-xl border border-slate-200 p-4"
+                            key={faq.id}
+                        >
+                            <div className="flex gap-3">
+                                <div className="flex-1">
+                                    <FormField
+                                        error={nestedError(
+                                            `blocks.faqs.${index}.question`,
+                                        )}
+                                        label={`Pregunta ${index + 1}`}
+                                    >
+                                        <Input
+                                            value={faq.question}
+                                            onChange={(event) =>
+                                                form.setData('blocks', {
+                                                    ...form.data.blocks,
+                                                    faqs: (
+                                                        form.data.blocks
+                                                            ?.faqs ?? []
+                                                    ).map((item, itemIndex) =>
+                                                        itemIndex === index
+                                                            ? {
+                                                                  ...item,
+                                                                  question:
+                                                                      event
+                                                                          .target
+                                                                          .value,
+                                                              }
+                                                            : item,
+                                                    ),
+                                                })
+                                            }
+                                        />
+                                    </FormField>
+                                </div>
+                                <Button
+                                    aria-label={`Eliminar pregunta ${index + 1}`}
+                                    className="mt-7"
+                                    type="button"
+                                    variant="ghost"
+                                    onClick={() =>
+                                        form.setData('blocks', {
+                                            ...form.data.blocks,
+                                            faqs: (
+                                                form.data.blocks?.faqs ?? []
+                                            ).filter(
+                                                (_, itemIndex) =>
+                                                    itemIndex !== index,
+                                            ),
+                                        })
+                                    }
+                                >
+                                    <Trash2 className="size-4" />
+                                </Button>
+                            </div>
+                            <SummernoteField
+                                error={nestedError(
+                                    `blocks.faqs.${index}.answer`,
+                                )}
+                                id={`blocks_faq_${index}_answer`}
+                                label="Respuesta"
+                                height={130}
+                                value={faq.answer}
+                                onChange={(nextValue) =>
+                                    form.setData('blocks', {
+                                        ...form.data.blocks,
+                                        faqs: (
+                                            form.data.blocks?.faqs ?? []
+                                        ).map((item, itemIndex) =>
+                                            itemIndex === index
+                                                ? { ...item, answer: nextValue }
+                                                : item,
+                                        ),
+                                    })
+                                }
+                            />
+                        </div>
+                    ))}
                 </div>
             </AdminFormSection>
 

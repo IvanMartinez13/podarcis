@@ -1,7 +1,10 @@
-import type { LucideIcon, LucideProps } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import {
+    Award,
     BarChart3,
     BookOpen,
+    ChartNoAxesColumn,
+    ChartSpline,
     CheckCircle2,
     ClipboardCheck,
     GraduationCap,
@@ -9,33 +12,26 @@ import {
     Map as MapIcon,
     MonitorCog,
     Recycle,
+    Scale,
     ShieldCheck,
 } from 'lucide-react';
-import { dynamicIconImports, iconNames } from 'lucide-react/dynamic';
-import type { IconName } from 'lucide-react/dynamic';
-import { createElement, forwardRef, useEffect, useState } from 'react';
 
 const serviceIcons: Record<string, LucideIcon> = {
+    award: Award,
     'bar-chart-3': BarChart3,
     'book-open': BookOpen,
     'check-circle-2': CheckCircle2,
     'clipboard-check': ClipboardCheck,
+    'chart-no-axes-column': ChartNoAxesColumn,
+    'chart-spline': ChartSpline,
     'graduation-cap': GraduationCap,
     leaf: Leaf,
     map: MapIcon,
     'monitor-cog': MonitorCog,
     recycle: Recycle,
+    scale: Scale,
     'shield-check': ShieldCheck,
 };
-
-const iconAliases: Record<string, string> = {
-    // Common check variants not available in the installed Lucide version.
-    'message-circle-check': 'message-circle',
-    'message-square-check': 'message-square',
-};
-
-const validDynamicIcons = new Set<string>(iconNames);
-const dynamicIconCache = new Map<string, LucideIcon>();
 
 function normalizeServiceIconName(icon: string): string {
     return icon
@@ -48,69 +44,14 @@ function normalizeServiceIconName(icon: string): string {
 
 function resolveServiceIconName(
     icon: string | null | undefined,
-): IconName | null {
+): string | null {
     if (!icon) {
         return null;
     }
 
     const normalized = normalizeServiceIconName(icon);
-    const resolved = iconAliases[normalized] ?? normalized;
 
-    return validDynamicIcons.has(resolved) ? (resolved as IconName) : null;
-}
-
-async function loadServiceIcon(iconName: IconName): Promise<LucideIcon> {
-    const module = await dynamicIconImports[iconName]();
-
-    return module.default;
-}
-
-function resolveLucideIcon(iconName: IconName): LucideIcon {
-    const cached = dynamicIconCache.get(iconName);
-
-    if (cached) {
-        return cached;
-    }
-
-    const DynamicServiceIcon = forwardRef<SVGSVGElement, LucideProps>(
-        (props, ref) => {
-            const [LoadedIcon, setLoadedIcon] = useState<LucideIcon | null>(
-                null,
-            );
-
-            useEffect(() => {
-                let isMounted = true;
-
-                loadServiceIcon(iconName)
-                    .then((resolvedIcon) => {
-                        if (isMounted) {
-                            setLoadedIcon(() => resolvedIcon);
-                        }
-                    })
-                    .catch(() => {
-                        if (isMounted) {
-                            setLoadedIcon(() => Leaf);
-                        }
-                    });
-
-                return () => {
-                    isMounted = false;
-                };
-            }, []);
-
-            const IconComponent = LoadedIcon ?? Leaf;
-
-            return createElement(IconComponent, {
-                ...props,
-                ref,
-            });
-        },
-    );
-
-    DynamicServiceIcon.displayName = `ServiceIcon(${iconName})`;
-    dynamicIconCache.set(iconName, DynamicServiceIcon as LucideIcon);
-
-    return DynamicServiceIcon as LucideIcon;
+    return serviceIcons[normalized] ? normalized : null;
 }
 
 function getServiceIcon(icon: string | null | undefined): LucideIcon {
@@ -120,18 +61,7 @@ function getServiceIcon(icon: string | null | undefined): LucideIcon {
         return Leaf;
     }
 
-    const staticIcon = serviceIcons[resolved];
-
-    if (staticIcon) {
-        return staticIcon;
-    }
-
-    return resolveLucideIcon(resolved);
+    return serviceIcons[resolved];
 }
 
-export {
-    getServiceIcon,
-    loadServiceIcon,
-    normalizeServiceIconName,
-    resolveServiceIconName,
-};
+export { getServiceIcon, normalizeServiceIconName, resolveServiceIconName };

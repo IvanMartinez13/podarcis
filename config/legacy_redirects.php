@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'noticias' => '/blog',
+    'servicios-online' => '/soluciones-digitales',
+    'contacta' => '/contacto',
+    'aviso-legal' => '/aviso-legal',
+    'politica-privacidad' => '/politica-de-privacidad',
+    'politica-cookies' => '/politica-de-cookies',
+    'estudios-ambientales' => '/servicios/estudios-ambientales',
+    'vigilancia-ambiental-de-obras' => '/servicios/vigilancia-ambiental-de-obras',
+    'calculo-de-la-huella-de-carbono' => '/servicios/calculo-de-huella-de-carbono',
+    'sistemas-de-gestion' => '/servicios/sistemas-de-gestion',
+    'gestion-ambiental-y-sostenibilidad' => '/servicios/consultoria-sostenibilidad-esg',
+    'planes-de-circularidad' => '/servicios/plan-circularidad-sector-hotelero',
+    'legislacion-ambiental' => '/servicios/cumplimiento-legislacion-ambiental',
+    'formacion' => '/servicios/formacion',
+    'visores-cartograficos' => '/servicios/visores-cartograficos',
+    'legislacion-online' => '/soluciones-digitales/legislacion-online',
+    'uuups-app' => '/soluciones-digitales/uuupsapp',
+    'esg-suite-solutions' => '/soluciones-digitales/esg-suite-solutions',
+    'double-u-certificate' => '/soluciones-digitales/esg-suite-solutions',
+    'formacion-medioambiental' => '/servicios/formacion',
+    'gestion-de-incidencias-uuupsapp' => '/soluciones-digitales/uuupsapp',
+];
